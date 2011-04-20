@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>org.nds.dbdroid.remoting</groupId>
+        <artifactId>dbdroid-remoting-client-parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+    
+    <groupId>org.nds.dbdroid.remoting</groupId>
+    <artifactId>dbdroid-remoting-client</artifactId>
+    <packaging>jar</packaging>
+    <name>dbdrdoid-remoting-client : communicate an Android app to a remote database</name>
+
+	<description></description>
+
+	<developers>
+		<developer>
+			<id>nicolas.dossantos</id>
+			<name>Nicolas Dos Santos</name>
+			<email>nicolas.dossantos@gmail.com</email>
+		</developer>
+	</developers>
+	
+	<url>http://code.google.com/p/dbdroid-remoting/</url>
+	
+    <dependencies>
+    	<dependency>
+            <groupId>com.google.android</groupId>
+            <artifactId>android</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+		<dependency>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpclient</artifactId>
+		    <version>4.0.1</version>
+		    <classifier>tests</classifier>
+		    <scope>test</scope>
+		</dependency>
+
+		<dependency>
+            <groupId>org.nds.logging</groupId>
+        	<artifactId>nds-logging</artifactId>
+        </dependency>
+
+		<dependency>
+            <groupId>org.nds.dbdroid</groupId>
+        	<artifactId>dbdroid-core</artifactId>
+        </dependency>
+        
+        <dependency>
+		    <groupId>com.thoughtworks.xstream</groupId>
+		    <artifactId>xstream</artifactId>
+		    <version>1.3.1</version>
+		</dependency>
+        
+        <dependency>
+            <groupId>org.nds.dbdroid.remoting</groupId>
+            <artifactId>dbdroid-remoting-sample-commons</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.1</version>
+				<executions>
+					<execution>
+						<phase>install</phase>
+						<configuration>
+							<tasks>
+								<property name="maven.repo" value="${user.home}/.m2/repository" />
+								<echo message="Maven repo: ${maven.repo}" />
+								<echo message="filename: ${project.artifactId}-${project.parent.version}.${project.packaging}" />
+								
+								<taskdef classname="net.bluecow.googlecode.ant.GoogleCodeUploadTask" classpath="${maven.repo}/net/bluecow/googlecode/ant/ant-googlecode-0.0.2.jar" name="gcupload" />
+								
+								<property file="build.credentials.properties" />
+	    						<fail unless="gc.username" message="Missing property 'gc.username' from file 'build.credentials.properties'." />
+	    						<fail unless="gc.password" message="Missing property 'gc.password' from file 'build.credentials.properties'." />
+								
+								<gcupload username="${gc.username}" password="${gc.password}" 
+								          projectname="${project.artifactId}" 
+								          filename="target/${project.artifactId}-${project.parent.version}.${project.packaging}" 
+								          targetfilename="${project.artifactId}-${project.parent.version}.${project.packaging}" 
+								          summary="Version ${project.parent.version} of ${project.artifactId}" 
+								          labels="${project.parent.version}, ${project.artifactId}, Database, Entity, DAO, Android, SQL, Remoting, XML, Serialiaze, DatabaseManager, Query, Developer" />
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

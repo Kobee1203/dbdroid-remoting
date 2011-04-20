@@ -1,0 +1,2 @@
+INSERT INTO CONTACTS(ID, FIRSTNAME, LASTNAME, EMAIL, TELEPHONE) VALUES (1, 'Nicolas', 'Dos Santos', 'nicolas.dossantos@gmail.com', '06-XX-XX-XX-XX');
+INSERT INTO CONTACTS(ID, FIRSTNAME, LASTNAME, EMAIL, TELEPHONE) VALUES (2, 'John', 'Doe', 'john@doe.com', '01-XX-XX-XX-XX');

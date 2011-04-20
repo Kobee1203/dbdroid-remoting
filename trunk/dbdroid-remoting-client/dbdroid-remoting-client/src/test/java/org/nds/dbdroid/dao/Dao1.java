@@ -1,0 +1,15 @@
+package org.nds.dbdroid.dao;
+
+import org.nds.dbdroid.DataBaseManager;
+import org.nds.dbdroid.entity.Entity1;
+
+public class Dao1 extends AndroidDAO<Entity1, Integer> {
+
+    public Dao1(DataBaseManager dbManager) {
+        super(dbManager);
+    }
+
+    public <E> E save(E entity) {
+        return dbManager.saveOrUpdate(entity);
+    }
+}
