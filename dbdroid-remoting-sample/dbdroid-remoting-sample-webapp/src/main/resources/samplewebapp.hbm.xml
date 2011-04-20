@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<!--
+  - Mapping file for the Hibernate implementation.
+    -->
+<hibernate-mapping auto-import="true" default-lazy="false">
+    <class name="org.nds.dbdroid.remoting.commons.entity.Contact" table="CONTACTS">
+        <id name="id" column="ID">
+            <generator class="identity"/>
+        </id>
+        <property name="firstname" column="FIRSTNAME"/>
+        <property name="lastname" column="LASTNAME"/>
+        <property name="email" column="EMAIL"/>
+        <property name="telephone" column="telephone"/>
+    </class>
+</hibernate-mapping>
