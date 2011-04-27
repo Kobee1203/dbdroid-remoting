@@ -29,12 +29,14 @@ public class ServerFactoryBean {
     /**
      * Create a server with a service controller
      */
-    public void create() {
+    public Server create() {
         IServiceController serviceController = new ServiceController();
         serviceController.setServiceManager(serviceManager);
 
         server = new ServerImpl();
         server.register(urlPattern, new ServiceDispatcherHandler(serviceController));
+
+        return server;
     }
 
     public void registerService(IAndroidService service) {

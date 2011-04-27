@@ -40,7 +40,16 @@ public class ServiceManager implements IServiceManager {
         }
     }
 
-    public void invoke(String service, String method, Object[] arguments, HttpMethod httpMethod) throws Exception {
+    public Object invoke(String service, String method, Object[] arguments, HttpMethod httpMethod) throws Exception {
+        Object o = null;
 
+        ServiceEndPoint serviceEndPoint = serviceMap.get(service);
+        if (serviceEndPoint != null && serviceEndPoint.acceptHttpMethod(method, httpMethod)) {
+            o = serviceEndPoint.invokeMethod(method, arguments);
+        } else {
+            logger.error("Service '" + service + "' not found.");
+        }
+
+        return o;
     }
 }
