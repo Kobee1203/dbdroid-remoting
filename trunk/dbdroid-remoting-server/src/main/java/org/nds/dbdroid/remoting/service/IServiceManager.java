@@ -23,7 +23,8 @@ public interface IServiceManager {
      * Invoke request, and call the asked Service
      * @param request current HTTP request
      * @param response current HTTP response
+     * @return 
      * @throws Exception in case of errors
      */
-    void invoke(String serviceClass, String method, Object[] arguments, HttpMethod httpMethod) throws Exception;
+    Object invoke(String serviceClass, String method, Object[] arguments, HttpMethod httpMethod) throws Exception;
 }

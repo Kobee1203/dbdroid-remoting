@@ -16,9 +16,10 @@ public interface IServiceController {
      * @param method       : method invoked in the Service
      * @param arguments    : optional arguments for the Service method
      * @param httpMethod   : HTTP Method
+     * @return 
      * @throws Exception
      */
-    void invoke(String service, String method, Object[] arguments, HttpMethod httpMethod) throws Exception;
+    Object invoke(String service, String method, Object[] arguments, HttpMethod httpMethod) throws Exception;
 
     /**
      * Sets the ServiceManager

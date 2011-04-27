@@ -3,10 +3,13 @@ package org.nds.dbdroid.remoting.servlet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletConfig;
@@ -16,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.output.StringBuilderWriter;
+import org.nds.dbdroid.remoting.XStreamHelper;
 import org.nds.dbdroid.remoting.controller.IServiceController;
 import org.nds.dbdroid.service.HttpMethod;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,30 +90,25 @@ public class DBDroidServlet extends HttpServlet {
 
         System.out.println("# HTTP METHOD: " + httpMethod);
 
+        OutputStream out = null;
         try {
             String service = null;
             String method = null;
-            Object[] arguments = null;
+            List<Object> arguments = new ArrayList<Object>();
 
             String pathInfo = request.getPathInfo();
             if (pathInfo.startsWith("/")) {
                 pathInfo = pathInfo.substring(1);
             }
-            int slashIndex = pathInfo.indexOf('/');
-            if (slashIndex != -1) {
-                service = pathInfo.substring(0, slashIndex);
-                method = pathInfo.substring(slashIndex + 1);
-                slashIndex = method.indexOf('/');
-                if (slashIndex != -1) { // one argument in the URI
-                    String m = method.substring(0, slashIndex);
-                    String argument = method.substring(slashIndex + 1);
-
-                    arguments = new Object[] { argument };
-                    method = m;
+            String[] split = pathInfo.split("/");
+            if (split != null && split.length >= 2) {
+                service = split[0];
+                method = split[1];
+                if (split.length > 2) { // any arguments in the URI
+                    for (int i = 2; i < split.length; i++) {
+                        arguments.add(split[i]);
+                    }
                 }
-                System.out.println("SERVICE NAME: " + service);
-                System.out.println("METHOD: " + method);
-                System.out.println("ARGUMENTS: " + Arrays.toString(arguments));
 
                 System.out.println("##### ATTRIBUTES NAMES #####");
                 Enumeration<String> attrNames = request.getAttributeNames();
@@ -142,13 +141,34 @@ public class DBDroidServlet extends HttpServlet {
                 System.out.println("INPUSTREAM: " + s1);
                 //String s2 = toString(request.getReader());
                 //System.out.println("READER: " + s2);
+                Object stringArgs = XStreamHelper.fromXML(s1, null);
+                Object[] args = stringArgs instanceof Object[] ? (Object[]) stringArgs : new Object[] { stringArgs };
+                for (Object arg : args) {
+                    arguments.add(arg);
+                }
+
+                System.out.println("SERVICE NAME: " + service);
+                System.out.println("METHOD: " + method);
+                System.out.println("ARGUMENTS: " + Arrays.toString(arguments.toArray()));
             }
-            //controller.invoke(service, method, arguments, httpMethod);
-            System.out.println("***** END SERVICE INVOCATION *****");
+            Object o = controller.invoke(service, method, arguments.toArray(), httpMethod);
+            String xml = XStreamHelper.toXML(o, null);
+            byte[] bytes = xml.getBytes();
+            response.setContentType("text/xml");
+            response.setContentLength(bytes.length);
+            out = response.getOutputStream();
+            out.write(bytes, 0, bytes.length);
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                out.flush();
+                out.close();
+            } catch (Exception e) {
+            }
         }
 
+        System.out.println("***** END SERVICE INVOCATION *****");
     }
 
     public static String toString(InputStream input) throws IOException {

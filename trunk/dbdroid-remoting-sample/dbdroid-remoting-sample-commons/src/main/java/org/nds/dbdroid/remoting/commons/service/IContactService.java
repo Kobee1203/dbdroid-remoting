@@ -7,7 +7,7 @@ import org.nds.dbdroid.service.EndPoint;
 import org.nds.dbdroid.service.HttpMethod;
 import org.nds.dbdroid.service.IAndroidService;
 
-@EndPoint(value = "/contactService")
+@EndPoint(value = "contactService")
 public interface IContactService extends IAndroidService {
 
     List<Contact> listContact();
@@ -20,7 +20,7 @@ public interface IContactService extends IAndroidService {
     @EndPoint(httpMethod = HttpMethod.POST)
     Contact update(Contact contact);
 
-    @EndPoint(value = "/deleteContact", httpMethod = HttpMethod.POST)
+    @EndPoint(value = "deleteContact", httpMethod = HttpMethod.POST)
     void delete(Contact contact);
 
     @EndPoint(httpMethod = HttpMethod.DELETE)

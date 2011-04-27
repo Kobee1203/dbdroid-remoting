@@ -11,8 +11,8 @@ public class ServiceController implements IServiceController {
 
     private IServiceManager serviceManager = new ServiceManager();
 
-    public void invoke(String service, String method, Object[] arguments, HttpMethod httpMethod) throws Exception {
-        serviceManager.invoke(service, method, arguments, httpMethod);
+    public Object invoke(String service, String method, Object[] arguments, HttpMethod httpMethod) throws Exception {
+        return serviceManager.invoke(service, method, arguments, httpMethod);
     }
 
     public void setServiceManager(IServiceManager serviceManager) {
