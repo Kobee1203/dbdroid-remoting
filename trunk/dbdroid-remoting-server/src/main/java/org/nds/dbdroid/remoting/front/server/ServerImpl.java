@@ -33,7 +33,6 @@ import org.apache.http.protocol.ResponseDate;
 import org.apache.http.protocol.ResponseServer;
 import org.nds.dbdroid.remoting.front.server.handler.EchoHandler;
 import org.nds.dbdroid.remoting.front.server.handler.RandomHandler;
-import org.nds.dbdroid.service.IAndroidService;
 
 public class ServerImpl implements Server {
 
@@ -43,7 +42,7 @@ public class ServerImpl implements Server {
     private final BasicHttpProcessor httpProcessor;
     private final HttpParams serverParams;
     private final SSLContext sslcontext;
-    protected volatile ServerSocket servicedSocket;
+    protected volatile ServerSocket serverSocket;
     protected volatile Thread listenerThread;
     private final AtomicInteger acceptedConnections;
 
@@ -103,18 +102,8 @@ public class ServerImpl implements Server {
         this.handlerRegistry.unregister(pattern);
     }
 
-    public void registerService(IAndroidService service) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void unregisterService(IAndroidService service) {
-        // TODO Auto-generated method stub
-
-    }
-
     public void start() throws Exception {
-        if (this.servicedSocket != null) {
+        if (this.serverSocket != null) {
             throw new IllegalStateException(toString() + " already running");
         }
         ServerSocket ssock;
@@ -127,7 +116,7 @@ public class ServerImpl implements Server {
 
         ssock.setReuseAddress(true);
         ssock.bind(TEST_SERVER_ADDR);
-        this.servicedSocket = ssock;
+        this.serverSocket = ssock;
 
         this.listenerThread = new Thread(new RequestListener());
         this.listenerThread.setDaemon(false);
@@ -135,16 +124,16 @@ public class ServerImpl implements Server {
     }
 
     public void stop() throws Exception {
-        if (this.servicedSocket == null) {
+        if (this.serverSocket == null) {
             return;
         }
         try {
-            this.servicedSocket.close();
+            this.serverSocket.close();
         } catch (IOException iox) {
             System.out.println("error stopping " + this);
             iox.printStackTrace(System.out);
         } finally {
-            this.servicedSocket = null;
+            this.serverSocket = null;
         }
 
         if (this.listenerThread != null) {
@@ -160,7 +149,7 @@ public class ServerImpl implements Server {
 
     @Override
     public String toString() {
-        ServerSocket ssock = this.servicedSocket;
+        ServerSocket ssock = this.serverSocket;
         StringBuffer sb = new StringBuffer(80);
         sb.append("ServerImpl/");
         if (ssock == null) {
@@ -171,24 +160,24 @@ public class ServerImpl implements Server {
         return sb.toString();
     }
 
-    public int getServicePort() {
-        ServerSocket ssock = this.servicedSocket;
+    public int getServerPort() {
+        ServerSocket ssock = this.serverSocket;
         if (ssock == null) {
             throw new IllegalStateException("not running");
         }
         return ssock.getLocalPort();
     }
 
-    public String getServiceHostName() {
-        ServerSocket ssock = this.servicedSocket;
+    public String getServerHostName() {
+        ServerSocket ssock = this.serverSocket;
         if (ssock == null) {
             throw new IllegalStateException("not running");
         }
         return ((InetSocketAddress) ssock.getLocalSocketAddress()).getHostName();
     }
 
-    public SocketAddress getServiceAddress() {
-        ServerSocket ssock = this.servicedSocket;
+    public SocketAddress getServerAddress() {
+        ServerSocket ssock = this.serverSocket;
         if (ssock == null) {
             throw new IllegalStateException("not running");
         }
@@ -204,7 +193,7 @@ public class ServerImpl implements Server {
 
         public void run() {
             try {
-                if ((ServerImpl.this.servicedSocket == null) || (ServerImpl.this.listenerThread != Thread.currentThread()) || (Thread.interrupted())) {
+                if ((ServerImpl.this.serverSocket == null) || (ServerImpl.this.listenerThread != Thread.currentThread()) || (Thread.interrupted())) {
                     ;
                 }
             } finally {
@@ -213,7 +202,7 @@ public class ServerImpl implements Server {
         }
 
         protected void accept() throws IOException {
-            Socket socket = ServerImpl.this.servicedSocket.accept();
+            Socket socket = ServerImpl.this.serverSocket.accept();
             ServerImpl.this.acceptedConnections.incrementAndGet();
             DefaultHttpServerConnection conn = new DefaultHttpServerConnection();
 
@@ -251,7 +240,7 @@ public class ServerImpl implements Server {
             public void run() {
                 HttpContext context = new BasicHttpContext(null);
                 try {
-                    while ((ServerImpl.this.servicedSocket != null) && (this.conn.isOpen()) && (!(Thread.interrupted()))) {
+                    while ((ServerImpl.this.serverSocket != null) && (this.conn.isOpen()) && (!(Thread.interrupted()))) {
                         this.httpservice.handleRequest(this.conn, context);
                     }
                 } catch (IOException ignore) {

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Application context definition on Hibernate.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:p="http://www.springframework.org/schema/p" 
+        xmlns:context="http://www.springframework.org/schema/context"
+        xsi:schemaLocation="
+            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <import resource="classpath:META-INF/dbdroid-remoting/dbdroid-remoting.xml" />
+
+    <!-- ========================= RESOURCE DEFINITIONS ========================= -->
+
+    <context:component-scan base-package="org.nds.dbdroid.remoting.webapp.service" />
+
+    <!-- ========================= BUSINESS OBJECT DEFINITIONS ========================= -->
+
+    <!--
+        Activates various annotations to be detected in bean classes:
+        Spring's @Required and @Autowired, as well as JSR 250's @Resource.
+    -->
+    <context:annotation-config/>
+
+</beans>
