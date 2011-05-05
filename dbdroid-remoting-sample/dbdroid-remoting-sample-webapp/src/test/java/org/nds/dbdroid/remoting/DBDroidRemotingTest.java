@@ -16,12 +16,16 @@ import org.nds.dbdroid.remoting.client.ClientManager;
 import org.nds.dbdroid.remoting.commons.entity.Contact;
 import org.nds.dbdroid.remoting.commons.service.IContactService;
 import org.nds.dbdroid.remoting.front.ServerFactoryBean;
+import org.nds.dbdroid.remoting.front.server.Server;
+import org.nds.dbdroid.remoting.webapp.service.ContactServiceImpl;
 import org.nds.logging.Logger;
 import org.nds.logging.LoggerFactory;
 
 public class DBDroidRemotingTest {
 
     private static final Logger log = LoggerFactory.getLogger(DBDroidRemotingTest.class);
+
+    private Server server;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -33,18 +37,27 @@ public class DBDroidRemotingTest {
 
     @Before
     public void setUp() throws Exception {
+        ServerFactoryBean sfb = new ServerFactoryBean();
+        sfb.setUrlPattern("/dbdroid-remoting/*");
+        sfb.registerService(new ContactServiceImpl());
+        server = sfb.create();
     }
 
     @After
     public void tearDown() throws Exception {
+        server.stop();
     }
 
     @Test
     public void testLocalServer() throws DBDroidException {
-        ServerFactoryBean sfb = new ServerFactoryBean();
-        sfb.setUrlPattern("/dbdroid-remoting/*");
-        sfb.registerService(null/*service*/);
-        sfb.create();
+        InputStream in = getClass().getResourceAsStream("/dbdroid.xml");
+        String serverUrl = "http://" + server.getServerHostName() + ":" + server.getServerPort() + "/dbdroid-remoting";
+        ClientManager clientManager = new ClientManager(in, serverUrl);
+        clientManager.loadConfig();
+
+        IContactService contactService = clientManager.getService(IContactService.class);
+
+        invokeService(contactService);
     }
 
     @Test
@@ -64,6 +77,11 @@ public class DBDroidRemotingTest {
         }
 
         IContactService contactService = clientManager.getService(IContactService.class);
+
+        invokeService(contactService);
+    }
+
+    private void invokeService(IContactService contactService) {
 
         Contact contact = null;
 
@@ -114,6 +132,5 @@ public class DBDroidRemotingTest {
         // Raw Query
 
         // Query
-
     }
 }

@@ -1,7 +1,8 @@
 package org.nds.dbdroid.remoting.front.server;
 
+import java.net.SocketAddress;
+
 import org.apache.http.protocol.HttpRequestHandler;
-import org.nds.dbdroid.service.IAndroidService;
 
 public interface Server {
 
@@ -13,7 +14,9 @@ public interface Server {
 
     void unregister(String pattern);
 
-    void registerService(IAndroidService service);
+    int getServerPort();
 
-    void unregisterService(IAndroidService service);
+    String getServerHostName();
+
+    SocketAddress getServerAddress();
 }
