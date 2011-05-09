@@ -11,21 +11,29 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.nds.dbdroid.exception.DBDroidException;
 import org.nds.dbdroid.remoting.client.ClientManager;
 import org.nds.dbdroid.remoting.commons.entity.Contact;
 import org.nds.dbdroid.remoting.commons.service.IContactService;
 import org.nds.dbdroid.remoting.front.ServerFactoryBean;
 import org.nds.dbdroid.remoting.front.server.Server;
-import org.nds.dbdroid.remoting.webapp.service.ContactServiceImpl;
 import org.nds.logging.Logger;
 import org.nds.logging.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "/spring/applicationContext.xml" })
 public class DBDroidRemotingTest {
 
     private static final Logger log = LoggerFactory.getLogger(DBDroidRemotingTest.class);
 
     private Server server;
+
+    @Autowired
+    private IContactService contactService;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -39,8 +47,12 @@ public class DBDroidRemotingTest {
     public void setUp() throws Exception {
         ServerFactoryBean sfb = new ServerFactoryBean();
         sfb.setUrlPattern("/dbdroid-remoting/*");
-        sfb.registerService(new ContactServiceImpl());
+        sfb.registerService(contactService);
         server = sfb.create();
+        server.start();
+
+        String serverUrl = "http://" + server.getServerHostName() + ":" + server.getServerPort();
+        System.out.println("Server available at " + serverUrl);
     }
 
     @After
@@ -50,20 +62,18 @@ public class DBDroidRemotingTest {
 
     @Test
     public void testLocalServer() throws DBDroidException {
-        InputStream in = getClass().getResourceAsStream("/dbdroid.xml");
         String serverUrl = "http://" + server.getServerHostName() + ":" + server.getServerPort() + "/dbdroid-remoting";
-        ClientManager clientManager = new ClientManager(in, serverUrl);
-        clientManager.loadConfig();
-
-        IContactService contactService = clientManager.getService(IContactService.class);
-
-        invokeService(contactService);
+        runtTest(serverUrl);
     }
 
     @Test
     public void testRemoteServer() throws DBDroidException {
-        InputStream in = getClass().getResourceAsStream("/dbdroid.xml");
         String serverUrl = "http://localhost:8080/dbdroid-remoting-sample-webapp/dbdroid-remoting";
+        runtTest(serverUrl);
+    }
+
+    private void runtTest(String serverUrl) throws DBDroidException {
+        InputStream in = getClass().getResourceAsStream("/dbdroid.xml");
         ClientManager clientManager = new ClientManager(in, serverUrl);
         clientManager.loadConfig();
 
