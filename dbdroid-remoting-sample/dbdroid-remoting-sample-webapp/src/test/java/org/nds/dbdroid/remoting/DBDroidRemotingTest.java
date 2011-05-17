@@ -2,10 +2,12 @@ package org.nds.dbdroid.remoting;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -18,8 +20,6 @@ import org.nds.dbdroid.remoting.commons.entity.Contact;
 import org.nds.dbdroid.remoting.commons.service.IContactService;
 import org.nds.dbdroid.remoting.front.ServerFactoryBean;
 import org.nds.dbdroid.remoting.front.server.Server;
-import org.nds.logging.Logger;
-import org.nds.logging.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -28,7 +28,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = { "/spring/applicationContext.xml" })
 public class DBDroidRemotingTest {
 
-    private static final Logger log = LoggerFactory.getLogger(DBDroidRemotingTest.class);
+    private static final Logger log = Logger.getLogger(DBDroidRemotingTest.class);
 
     private Server server;
 
@@ -52,7 +52,7 @@ public class DBDroidRemotingTest {
         server.start();
 
         String serverUrl = "http://" + server.getServerHostName() + ":" + server.getServerPort();
-        System.out.println("Server available at " + serverUrl);
+        log.debug("Server available at " + serverUrl);
     }
 
     @After
@@ -81,7 +81,7 @@ public class DBDroidRemotingTest {
         try {
             HttpGet httpget = new HttpGet(serverUrl + "/index");
             HttpResponse response = httpClient.execute(httpget);
-            System.out.println(HttpHelper.getStringResponse(response));
+            log.debug(HttpHelper.getStringResponse(response));
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
@@ -96,8 +96,8 @@ public class DBDroidRemotingTest {
         Contact contact = null;
 
         // Find All
-        /*log.debug("** FIND ALL CONTACTS **");
-        List<Contact> contacts = contactDAO.findAll();
+        log.debug("** FIND ALL CONTACTS **");
+        List<Contact> contacts = contactService.listContact();
         if (contacts != null) {
             for (Contact c : contacts) {
                 log.debug(c.toString());
@@ -106,10 +106,10 @@ public class DBDroidRemotingTest {
 
         // Find By Id
         log.debug("** FIND CONTACT BY ID **");
-        contact = contactDAO.findById("1");
+        contact = contactService.findById(1);
         if (contact != null) {
             log.debug(contact.toString());
-        }*/
+        }
 
         // Save
         /*log.debug("** SAVE CONTACT **");

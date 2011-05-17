@@ -7,17 +7,18 @@ import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.Writer;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.reflect.MethodUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.ClientContext;
-import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.ContentProducer;
 import org.apache.http.entity.EntityTemplate;
 import org.apache.http.impl.client.BasicCookieStore;
@@ -33,8 +34,10 @@ import org.nds.dbdroid.query.LogicalOperator;
 import org.nds.dbdroid.query.Operator;
 import org.nds.dbdroid.query.Query;
 import org.nds.dbdroid.query.QueryValueResolver;
+import org.nds.dbdroid.reflect.utils.AnnotationUtils;
 import org.nds.dbdroid.remoting.EntityAliases;
 import org.nds.dbdroid.remoting.XStreamHelper;
+import org.nds.dbdroid.service.EndPoint;
 import org.nds.dbdroid.service.IAndroidService;
 import org.nds.dbdroid.type.DataType;
 import org.nds.dbdroid.type.DbDroidType;
@@ -159,8 +162,8 @@ class ClientDataBaseManager extends DataBaseManager {
         return null;
     }
 
-    public final Object execute(String xml) {
-        return postQuery(xml, null);
+    public final Object execute(Object obj, Method method, Object... args) {
+        return sendQuery(obj, method, args);
     }
 
     private void postQuery(String queryString) {
@@ -183,6 +186,12 @@ class ClientDataBaseManager extends DataBaseManager {
         return postQuery(query, entityAliases);
     }
 
+    private Object sendQuery(Object obj, Method method, Object[] args) {
+        String xml = XStreamHelper.toXML(args, null);
+        -
+        return null;
+    }
+
     private Object postQuery(final String query, final EntityAliases entityAliases) {
         Object result = null;
 
@@ -195,9 +204,11 @@ class ClientDataBaseManager extends DataBaseManager {
 
         ContentProducer cp = new ContentProducer() {
             public void writeTo(OutputStream outstream) throws IOException {
-                Writer writer = new OutputStreamWriter(outstream, "UTF-8");
-                writer.write(query);
-                writer.flush();
+                if (query != null) {
+                    Writer writer = new OutputStreamWriter(outstream, "UTF-8");
+                    writer.write(query);
+                    writer.flush();
+                }
             }
         };
         HttpEntity httpEntity = new EntityTemplate(cp);
@@ -212,21 +223,16 @@ class ClientDataBaseManager extends DataBaseManager {
             // Bind custom cookie store to the local context
             localContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
 
-            HttpPost httppost = new HttpPost(serverUrl + "/" + className + "/" + methodName);
+            String uri = getUri(className, methodName);
+            HttpPost httppost = new HttpPost(serverUrl + uri);
             try {
                 httppost.setEntity(httpEntity);
 
                 HttpResponse response = httpClient.execute(httppost, localContext);
                 // String xml = HttpHelper.getStringResponse(response);
-                String xml = EntityUtils.toString(response.getEntity(), null);
+                String xml = response.getEntity() != null ? EntityUtils.toString(response.getEntity(), null) : null;
                 log.debug(xml);
                 result = XStreamHelper.fromXML(xml, entityAliases);
-
-                List<Cookie> cookies = httpClient.getCookieStore().getCookies();
-                for (int i = 0; i < cookies.size(); i++) {
-                    System.out.println("Local cookie: " + cookies.get(i));
-                }
-
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
             } catch (RuntimeException ex) {
@@ -244,6 +250,33 @@ class ClientDataBaseManager extends DataBaseManager {
         }
 
         return result;
+    }
+
+    private String getUri(String className, String methodName) {
+        String clazz = className;
+        String method = methodName;
+        Class<?> cls = null;
+        try {
+            cls = Class.forName(className);
+        } catch (ClassNotFoundException e1) {
+        }
+
+        EndPoint endPoint = AnnotationUtils.getAnnotation(cls, EndPoint.class);
+        if (endPoint != null) {
+            if (endPoint.value() != null) {
+                clazz = endPoint.value();
+            }
+        }
+
+        Method m = MethodUtils.getMatchingAccessibleMethod(cls, methodName, null);
+        endPoint = AnnotationUtils.getAnnotation(m, EndPoint.class);
+        if (endPoint != null) {
+            if (endPoint.value() != null) {
+                method = endPoint.value();
+            }
+        }
+
+        return "/" + clazz + "/" + method;
     }
 
     private StackTraceElement getCallingElement() {

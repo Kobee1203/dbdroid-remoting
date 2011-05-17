@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.output.StringBuilderWriter;
+import org.apache.log4j.Logger;
 import org.nds.dbdroid.remoting.XStreamHelper;
 import org.nds.dbdroid.remoting.controller.IServiceController;
 import org.nds.dbdroid.service.HttpMethod;
@@ -28,6 +29,8 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 public class DBDroidServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
+
+    private static final Logger log = Logger.getLogger(DBDroidServlet.class);
 
     @Autowired
     IServiceController controller;
@@ -74,21 +77,21 @@ public class DBDroidServlet extends HttpServlet {
     }
 
     protected void invoke(HttpServletRequest request, HttpServletResponse response, HttpMethod httpMethod) throws ServletException {
-        System.out.println("***** BEGIN SERVICE INVOCATION *****");
+        log.debug("***** BEGIN SERVICE INVOCATION *****");
 
         /*
-        System.out.println("ServletPath: " + request.getServletPath());
-        System.out.println("ContextPath: " + request.getContextPath());
-        System.out.println("RequestURI: " + request.getRequestURI());
-        System.out.println("RequestURL: " + request.getRequestURL());
-        System.out.println("PathInfo: " + request.getPathInfo());
-        System.out.println("PathTranslated: " + request.getPathTranslated());
-        System.out.println("QueryString: " + request.getQueryString());
-        System.out.println("ServletContextName: " + request.getSession().getServletContext().getServletContextName());
-        System.out.println("RealPath[/]: " + request.getSession().getServletContext().getRealPath("/"));
+        log.debug("ServletPath: " + request.getServletPath());
+        log.debug("ContextPath: " + request.getContextPath());
+        log.debug("RequestURI: " + request.getRequestURI());
+        log.debug("RequestURL: " + request.getRequestURL());
+        log.debug("PathInfo: " + request.getPathInfo());
+        log.debug("PathTranslated: " + request.getPathTranslated());
+        log.debug("QueryString: " + request.getQueryString());
+        log.debug("ServletContextName: " + request.getSession().getServletContext().getServletContextName());
+        log.debug("RealPath[/]: " + request.getSession().getServletContext().getRealPath("/"));
         */
 
-        System.out.println("# HTTP METHOD: " + httpMethod);
+        log.debug("# HTTP METHOD: " + httpMethod);
 
         OutputStream out = null;
         try {
@@ -110,54 +113,56 @@ public class DBDroidServlet extends HttpServlet {
                     }
                 }
 
-                System.out.println("##### ATTRIBUTES NAMES #####");
+                log.debug("##### ATTRIBUTES NAMES #####");
                 Enumeration<String> attrNames = request.getAttributeNames();
                 while (attrNames.hasMoreElements()) {
                     String attrName = attrNames.nextElement();
                     Object value = request.getAttribute(attrName);
-                    System.out.println(attrName + ": " + value);
+                    log.debug(attrName + ": " + value);
                 }
-                System.out.println("##### HEADER NAMES #####");
+                log.debug("##### HEADER NAMES #####");
                 Enumeration<String> headerNames = request.getHeaderNames();
                 while (headerNames.hasMoreElements()) {
                     String headerName = headerNames.nextElement();
                     Object value = request.getAttribute(headerName);
-                    System.out.println(headerName + ": " + value);
+                    log.debug(headerName + ": " + value);
                 }
-                System.out.println("##### PARAMETER NAMES #####");
+                log.debug("##### PARAMETER NAMES #####");
                 Enumeration<String> paramNames = request.getParameterNames();
                 while (paramNames.hasMoreElements()) {
                     String paramName = paramNames.nextElement();
                     Object value = request.getAttribute(paramName);
-                    System.out.println(paramName + ": " + value);
+                    log.debug(paramName + ": " + value);
                 }
-                System.out.println("##### PARAMETER MAP #####");
+                log.debug("##### PARAMETER MAP #####");
                 Map<?, ?> paramMap = request.getParameterMap();
                 for (Map.Entry<?, ?> entry : paramMap.entrySet()) {
-                    System.out.println(entry.getKey() + ": " + entry.getValue());
+                    log.debug(entry.getKey() + ": " + entry.getValue());
                 }
 
                 String s1 = toString(request.getInputStream());
-                System.out.println("INPUSTREAM: " + s1);
+                log.debug("INPUSTREAM: " + s1);
                 //String s2 = toString(request.getReader());
-                //System.out.println("READER: " + s2);
+                //log.debug("READER: " + s2);
                 Object stringArgs = XStreamHelper.fromXML(s1, null);
                 Object[] args = stringArgs instanceof Object[] ? (Object[]) stringArgs : new Object[] { stringArgs };
                 for (Object arg : args) {
                     arguments.add(arg);
                 }
 
-                System.out.println("SERVICE NAME: " + service);
-                System.out.println("METHOD: " + method);
-                System.out.println("ARGUMENTS: " + Arrays.toString(arguments.toArray()));
+                log.debug("SERVICE NAME: " + service);
+                log.debug("METHOD: " + method);
+                log.debug("ARGUMENTS: " + Arrays.toString(arguments.toArray()));
             }
             Object o = controller.invoke(service, method, arguments.toArray(), httpMethod);
             String xml = XStreamHelper.toXML(o, null);
-            byte[] bytes = xml.getBytes();
-            response.setContentType("text/xml");
-            response.setContentLength(bytes.length);
-            out = response.getOutputStream();
-            out.write(bytes, 0, bytes.length);
+            if (xml != null) {
+                byte[] bytes = xml.getBytes();
+                response.setContentType("text/xml");
+                response.setContentLength(bytes.length);
+                out = response.getOutputStream();
+                out.write(bytes, 0, bytes.length);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -168,7 +173,7 @@ public class DBDroidServlet extends HttpServlet {
             }
         }
 
-        System.out.println("***** END SERVICE INVOCATION *****");
+        log.debug("***** END SERVICE INVOCATION *****");
     }
 
     public static String toString(InputStream input) throws IOException {

@@ -7,7 +7,7 @@ import org.nds.dbdroid.service.EndPoint;
 import org.nds.dbdroid.service.HttpMethod;
 import org.nds.dbdroid.service.IAndroidService;
 
-@EndPoint(value = "contactService")
+@EndPoint("contactService")
 public interface IContactService extends IAndroidService {
 
     List<Contact> listContact();

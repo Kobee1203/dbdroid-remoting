@@ -33,47 +33,61 @@ public final class XStreamHelper {
     }
 
     public static String toXML(Object entity, EntityAliases entityAliases) {
-        XStream xstream = initXStream(entityAliases);
-        String xml = xstream.toXML(entity);
-
+        String xml = null;
+        if (entity != null) {
+            XStream xstream = initXStream(entityAliases);
+            xml = xstream.toXML(entity);
+        }
         return xml;
     }
 
     public static void toXML(Object entity, EntityAliases entityAliases, OutputStream os) {
-        XStream xstream = initXStream(entityAliases);
-        xstream.toXML(entity, os);
+        if (entity != null) {
+            XStream xstream = initXStream(entityAliases);
+            xstream.toXML(entity, os);
+        }
     }
 
     public static void toXML(Object entity, EntityAliases entityAliases, Writer w) {
-        XStream xstream = initXStream(entityAliases);
-        xstream.toXML(entity, w);
+        if (entity != null) {
+            XStream xstream = initXStream(entityAliases);
+            xstream.toXML(entity, w);
+        }
     }
 
     public static String toXML(Query query, EntityAliases entityAliases) {
-        XStream xstream = initXStream(entityAliases);
-        String xml = xstream.toXML(query);
-
+        String xml = null;
+        if (query != null) {
+            XStream xstream = initXStream(entityAliases);
+            xml = xstream.toXML(query);
+        }
         return xml;
     }
 
     public static Object fromXML(String xml, EntityAliases entityAliases) {
-        XStream xstream = initXStream(entityAliases);
-        Object entity = xstream.fromXML(xml);
-
+        Object entity = null;
+        if (xml != null && xml.length() > 0) {
+            XStream xstream = initXStream(entityAliases);
+            entity = xstream.fromXML(xml);
+        }
         return entity;
     }
 
     public static Object fromXML(InputStream xml, EntityAliases entityAliases) {
-        XStream xstream = initXStream(entityAliases);
-        Object entity = xstream.fromXML(xml);
-
+        Object entity = null;
+        if (xml != null) {
+            XStream xstream = initXStream(entityAliases);
+            entity = xstream.fromXML(xml);
+        }
         return entity;
     }
 
     public static Object fromXML(Reader xml, EntityAliases entityAliases) {
-        XStream xstream = initXStream(entityAliases);
-        Object entity = xstream.fromXML(xml);
-
+        Object entity = null;
+        if (xml != null) {
+            XStream xstream = initXStream(entityAliases);
+            entity = xstream.fromXML(xml);
+        }
         return entity;
     }
 
