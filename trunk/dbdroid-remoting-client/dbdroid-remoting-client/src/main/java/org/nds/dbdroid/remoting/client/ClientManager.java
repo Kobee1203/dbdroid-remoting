@@ -5,7 +5,6 @@ import java.lang.reflect.Method;
 
 import org.nds.dbdroid.dao.IAndroidDAO;
 import org.nds.dbdroid.exception.DBDroidException;
-import org.nds.dbdroid.remoting.XStreamHelper;
 import org.nds.dbdroid.remoting.proxy.IProxyFactory;
 import org.nds.dbdroid.remoting.proxy.JavaProxyFactory;
 import org.nds.dbdroid.service.IAndroidService;
@@ -61,8 +60,7 @@ public class ClientManager {
     }
 
     protected Object invoke(Object proxy, Method method, Object... args) {
-        String xml = XStreamHelper.toXML(args, null);
-        return this.dbManager.execute(xml);
+        return this.dbManager.execute(proxy, method, args);
     }
 
     private <T> IProxyFactory<T> createProxyFactory() {

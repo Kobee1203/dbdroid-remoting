@@ -34,7 +34,7 @@ public class ServerFactoryBean {
         serviceController.setServiceManager(serviceManager);
 
         server = new ServerImpl();
-        server.register(urlPattern, new ServiceDispatcherHandler(serviceController));
+        server.register(urlPattern, new ServiceDispatcherHandler(serviceController, urlPattern));
 
         return server;
     }

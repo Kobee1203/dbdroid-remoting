@@ -47,7 +47,7 @@ public class ServiceManager implements IServiceManager {
         if (serviceEndPoint != null && serviceEndPoint.acceptHttpMethod(method, httpMethod)) {
             o = serviceEndPoint.invokeMethod(method, arguments);
         } else {
-            logger.error("Service '" + service + "' not found.");
+            logger.error("Service End Point '" + service + "' not found.");
         }
 
         return o;
