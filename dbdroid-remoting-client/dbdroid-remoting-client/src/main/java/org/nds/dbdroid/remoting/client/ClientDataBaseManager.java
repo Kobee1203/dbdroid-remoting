@@ -9,15 +9,16 @@ import java.io.Writer;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.reflect.MethodUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.entity.ContentProducer;
 import org.apache.http.entity.EntityTemplate;
@@ -36,6 +37,7 @@ import org.nds.dbdroid.query.Query;
 import org.nds.dbdroid.query.QueryValueResolver;
 import org.nds.dbdroid.reflect.utils.AnnotationUtils;
 import org.nds.dbdroid.remoting.EntityAliases;
+import org.nds.dbdroid.remoting.RawQuery;
 import org.nds.dbdroid.remoting.XStreamHelper;
 import org.nds.dbdroid.service.EndPoint;
 import org.nds.dbdroid.service.IAndroidService;
@@ -167,51 +169,63 @@ class ClientDataBaseManager extends DataBaseManager {
     }
 
     private void postQuery(String queryString) {
-        postQuery("<rawQuery>" + queryString + "<rawQuery>", null);
+        sendQuery(new RawQuery(queryString), null);
     }
 
     private <E> List<E> postQuery(Query query) {
-        EntityAliases entityAliases = entityAliasesFromEntity.get(query.getEntityClass());
-
-        String queryString = XStreamHelper.toXML(query, null);
-
-        return (List<E>) postQuery(queryString, entityAliases);
+        // EntityAliases entityAliases = entityAliasesFromEntity.get(query.getEntityClass());
+        return (List<E>) sendQuery(query, null);
     }
 
     private Object postQuery(Object entity) {
-        EntityAliases entityAliases = entityAliasesFromEntity.get(entity.getClass());
-
-        String query = XStreamHelper.toXML(entity, null);
-
-        return postQuery(query, entityAliases);
+        // EntityAliases entityAliases = entityAliasesFromEntity.get(entity.getClass());
+        return sendQuery(entity, null);
     }
 
     private Object sendQuery(Object obj, Method method, Object[] args) {
-        String xml = XStreamHelper.toXML(args, null);
-        -
-        return null;
+        return send(method.getDeclaringClass(), method, args, null);
     }
 
-    private Object postQuery(final String query, final EntityAliases entityAliases) {
-        Object result = null;
+    private Object sendQuery(Object arguments, EntityAliases entityAliases) {
+        Object[] args = arguments == null ? null : arguments instanceof Object[] ? (Object[]) arguments : new Object[] { arguments };
 
-        StackTraceElement callingElement = getCallingElement();
-        String methodName = callingElement.getMethodName();
-        String className = callingElement.getClassName();
+        StackTraceElementExtended callingElement = getCallingElement(getParameterTypes(args));
+        Method method = callingElement.getMethod();
+        Class<?> clazz = callingElement.getDeclaringClass();
         if (entityAliases != null && entityAliases.getEntity() != null) {
-            className = getDAOFromEntity(entityAliases.getEntity()).getClass().getName();
+            clazz = getDAOFromEntity(entityAliases.getEntity()).getClass();
         }
 
-        ContentProducer cp = new ContentProducer() {
-            public void writeTo(OutputStream outstream) throws IOException {
-                if (query != null) {
-                    Writer writer = new OutputStreamWriter(outstream, "UTF-8");
-                    writer.write(query);
-                    writer.flush();
+        return send(clazz, method, args, null);
+    }
+
+    private StackTraceElementExtended getCallingElement(Class<?>[] parameterTypes) {
+        StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+        StackTraceElementExtended callingElement = null;
+        for (StackTraceElement element : elements) {
+            String className = element.getClassName();
+            try {
+                Class<?> clazz = Class.forName(className);
+                if (getClass().equals(clazz) || ClientManager.class.equals(clazz) || ClientInvocationHandler.class.equals(clazz)) {
+                    callingElement = new StackTraceElementExtended(element, parameterTypes);
+                } else if (IAndroidDAO.class.isAssignableFrom(clazz) || IAndroidService.class.isAssignableFrom(clazz)) {
+                    if (Proxy.class.isAssignableFrom(clazz)) {
+                        element = new StackTraceElement(clazz.getInterfaces()[0].getName(), element.getMethodName(), element.getFileName(), element.getLineNumber());
+                    }
+                    callingElement = new StackTraceElementExtended(element, parameterTypes);
+                } else if (callingElement != null) {
+                    break;
                 }
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
             }
-        };
-        HttpEntity httpEntity = new EntityTemplate(cp);
+        }
+
+        return callingElement;
+    }
+
+    private Object send(Class<?> clazz, Method method, Object[] args, EntityAliases entityAliases) {
+        Object result = null;
 
         DefaultHttpClient httpClient = new DefaultHttpClient();
         try {
@@ -223,15 +237,13 @@ class ClientDataBaseManager extends DataBaseManager {
             // Bind custom cookie store to the local context
             localContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
 
-            String uri = getUri(className, methodName);
-            HttpPost httppost = new HttpPost(serverUrl + uri);
+            String uri = getUri(clazz, method);
+            HttpUriRequest httpUriRequest = getHttpUriRequest(serverUrl + uri, clazz, method, args, entityAliases);
             try {
-                httppost.setEntity(httpEntity);
-
-                HttpResponse response = httpClient.execute(httppost, localContext);
+                HttpResponse response = httpClient.execute(httpUriRequest, localContext);
                 // String xml = HttpHelper.getStringResponse(response);
                 String xml = response.getEntity() != null ? EntityUtils.toString(response.getEntity(), null) : null;
-                log.debug(xml);
+                log.debug("RESULT: " + xml);
                 result = XStreamHelper.fromXML(xml, entityAliases);
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
@@ -239,7 +251,7 @@ class ClientDataBaseManager extends DataBaseManager {
                 // In case of an unexpected exception you may want to abort
                 // the HTTP request in order to shut down the underlying
                 // connection immediately.
-                httppost.abort();
+                httpUriRequest.abort();
                 throw ex;
             }
         } finally {
@@ -252,55 +264,59 @@ class ClientDataBaseManager extends DataBaseManager {
         return result;
     }
 
-    private String getUri(String className, String methodName) {
-        String clazz = className;
-        String method = methodName;
-        Class<?> cls = null;
-        try {
-            cls = Class.forName(className);
-        } catch (ClassNotFoundException e1) {
-        }
+    private HttpUriRequest getHttpUriRequest(String url, Class<?> clazz, Method method, final Object[] args, final EntityAliases entityAliases) {
 
-        EndPoint endPoint = AnnotationUtils.getAnnotation(cls, EndPoint.class);
-        if (endPoint != null) {
-            if (endPoint.value() != null) {
-                clazz = endPoint.value();
+        HttpUriRequest httpUriRequest;
+
+        HttpPost httppost = new HttpPost(url);
+
+        ContentProducer cp = new ContentProducer() {
+            public void writeTo(OutputStream outstream) throws IOException {
+                if (args != null) {
+                    String xml = XStreamHelper.toXML(args, entityAliases);
+                    Writer writer = new OutputStreamWriter(outstream, "UTF-8");
+                    writer.write(xml);
+                    writer.flush();
+                }
             }
-        }
+        };
+        HttpEntity httpEntity = new EntityTemplate(cp);
 
-        Method m = MethodUtils.getMatchingAccessibleMethod(cls, methodName, null);
-        endPoint = AnnotationUtils.getAnnotation(m, EndPoint.class);
-        if (endPoint != null) {
-            if (endPoint.value() != null) {
-                method = endPoint.value();
-            }
-        }
+        httppost.setEntity(httpEntity);
 
-        return "/" + clazz + "/" + method;
     }
 
-    private StackTraceElement getCallingElement() {
-        StackTraceElement[] elements = Thread.currentThread().getStackTrace();
-        StackTraceElement callingElement = null;
-        for (StackTraceElement element : elements) {
-            String className = element.getClassName();
-            try {
-                Class<?> clazz = Class.forName(className);
-                if (getClass().equals(clazz) || ClientManager.class.equals(clazz) || ClientInvocationHandler.class.equals(clazz)) {
-                    callingElement = element;
-                } else if (IAndroidDAO.class.isAssignableFrom(clazz) || IAndroidService.class.isAssignableFrom(clazz)) {
-                    if (Proxy.class.isAssignableFrom(clazz)) {
-                        element = new StackTraceElement(clazz.getInterfaces()[0].getName(), element.getMethodName(), element.getFileName(), element.getLineNumber());
-                    }
-                    callingElement = element;
-                } else if (callingElement != null) {
-                    break;
-                }
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+    private String getUri(Class<?> clazz, Method method) {
+        String endPointClazz = "";
+        String endPointMethod = "";
+
+        EndPoint endPoint = AnnotationUtils.getAnnotation(clazz, EndPoint.class);
+        if (endPoint != null) {
+            if (endPoint.value() != null) {
+                endPointClazz = endPoint.value();
             }
         }
 
-        return callingElement;
+        endPoint = AnnotationUtils.getAnnotation(method, EndPoint.class);
+        if (endPoint != null) {
+            if (endPoint.value() != null && endPoint.value().length() > 0) {
+                endPointMethod = endPoint.value();
+            }
+        }
+
+        return "/" + endPointClazz + "/" + endPointMethod;
+    }
+
+    private Class<?>[] getParameterTypes(Object[] args) {
+        if (args == null) {
+            return null;
+        }
+
+        List<Class<?>> argClasses = new ArrayList<Class<?>>();
+        for (Object arg : args) {
+            argClasses.add(arg.getClass());
+        }
+
+        return argClasses.toArray(new Class<?>[] {});
     }
 }
