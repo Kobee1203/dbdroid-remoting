@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.reflect.MethodUtils;
 import org.apache.log4j.Logger;
 import org.nds.dbdroid.reflect.utils.AnnotationUtils;
 import org.nds.dbdroid.reflect.utils.ReflectUtils;
@@ -24,9 +23,9 @@ public class ServiceEndPoint {
 
     private String serviceName;
 
-    private final Map<String, List<HttpMethod>> httpMethodsByMethod = new HashMap<String, List<HttpMethod>>();
+    private final Map<String, List<HttpMethod>> httpMethodsByEndPoint = new HashMap<String, List<HttpMethod>>();
 
-    private final Map<String, String> methodByEndPoint = new HashMap<String, String>();
+    private final Map<String, Method> methodByEndPoint = new HashMap<String, Method>();
 
     public ServiceEndPoint(Object serviceBean) {
         this.serviceBean = serviceBean;
@@ -45,14 +44,14 @@ public class ServiceEndPoint {
 
         Method[] methods = ReflectUtils.getMethods(cl);
         for (Method method : methods) {
-            String methodName = method.getName();
+            String endPointValue = method.getName();
             List<HttpMethod> httpMethodList = new ArrayList<HttpMethod>();
 
             EndPoint ep = AnnotationUtils.getAnnotation(method, EndPoint.class);
             if (ep != null) {
                 String epValue = ep.value();
                 if (!StringUtils.isBlank(epValue)) {
-                    methodName = epValue;
+                    endPointValue = epValue;
                 }
 
                 HttpMethod[] methodHttpMethod = ep.httpMethod();
@@ -63,8 +62,8 @@ public class ServiceEndPoint {
                 }
             }
 
-            httpMethodsByMethod.put(methodName, httpMethodList);
-            methodByEndPoint.put(methodName, method.getName());
+            httpMethodsByEndPoint.put(endPointValue, httpMethodList);
+            methodByEndPoint.put(endPointValue, method);
         }
     }
 
@@ -77,23 +76,29 @@ public class ServiceEndPoint {
     }
 
     public boolean acceptHttpMethod(String endPoint, HttpMethod httpMethod) {
-        if (endPoint == null || !httpMethodsByMethod.containsKey(endPoint)) {
+        if (endPoint == null || !httpMethodsByEndPoint.containsKey(endPoint)) {
             logger.error("EndPoint '" + endPoint + "' not found for the Service '" + serviceName + "' (" + serviceBean + ")");
             return false;
         }
-        List<HttpMethod> httpMethodList = httpMethodsByMethod.get(endPoint);
+        List<HttpMethod> httpMethodList = httpMethodsByEndPoint.get(endPoint);
         return httpMethodList.isEmpty() || httpMethodList.contains(httpMethod);
     }
 
-    private String getRealMethod(String method) {
+    private Method getRealMethod(String method) {
         return methodByEndPoint.get(method);
     }
 
     public Object invokeMethod(String method, Object[] arguments) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        String m = getRealMethod(method);
+        Method m = getRealMethod(method);
         if (m == null) {
             throw new NoSuchMethodException("Cannot found method: " + method + "() on object: " + serviceBean.getClass().getName());
         }
-        return MethodUtils.invokeMethod(serviceBean, m, arguments);
+        List<Object> args = new ArrayList<Object>();
+        for (Object arg : arguments) {
+            convert to the good primitive
+            args.add(arg);
+        }
+        return m.invoke(serviceBean, args.toArray());
+        // return MethodUtils.invokeMethod(serviceBean, m.getName(), arguments);
     }
 }
