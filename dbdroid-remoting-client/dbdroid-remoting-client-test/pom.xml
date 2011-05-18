@@ -41,6 +41,22 @@
             <groupId>org.nds.logging</groupId>
         	<artifactId>nds-logging</artifactId>
         </dependency>
+        
+        <dependency>
+            <groupId>org.nds.dbdroid.remoting</groupId>
+            <artifactId>dbdroid-remoting-sample-webapp</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nds.dbdroid.remoting</groupId>
+            <artifactId>dbdroid-remoting-client</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nds.dbdroid.remoting</groupId>
+            <artifactId>dbdroid-remoting-server</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
 
         <!-- the target apk, which we will test. will automatically be deployed to device in pre-integration-test phase. -->
         <dependency>

@@ -20,6 +20,10 @@ public class ClientManager {
     public void loadConfig() throws DBDroidException {
         this.dbManager.open();
     }
+    
+	public void setClassLoader(ClassLoader classLoader) {
+		this.dbManager.setClassLoader(classLoader);
+	}
 
     public <T extends IAndroidService> T getService(Class<T> serviceClass) {
         if (serviceClass.isInterface()) {
@@ -36,6 +40,8 @@ public class ClientManager {
             return this.dbManager.getDAO(daoClass);
         }
     }
+    
+    
 
     private <T extends IAndroidService> T createAndroidService(Class<T> service) {
         try {

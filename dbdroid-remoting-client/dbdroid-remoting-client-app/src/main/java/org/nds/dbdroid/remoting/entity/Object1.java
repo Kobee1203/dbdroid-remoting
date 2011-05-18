@@ -1,4 +1,4 @@
-package org.nds.dbdroid.sqlite.entity;
+package org.nds.dbdroid.remoting.entity;
 
 import org.nds.dbdroid.annotation.Entity;
 import org.nds.dbdroid.annotation.Id;

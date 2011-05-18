@@ -292,7 +292,7 @@ class ClientDataBaseManager extends DataBaseManager {
 
         EndPoint endPoint = AnnotationUtils.getAnnotation(clazz, EndPoint.class);
         if (endPoint != null) {
-            if (endPoint.value() != null) {
+            if (endPoint.value() != null && endPoint.value().length() > 0) {
                 endPointClazz = endPoint.value();
             }
         }
