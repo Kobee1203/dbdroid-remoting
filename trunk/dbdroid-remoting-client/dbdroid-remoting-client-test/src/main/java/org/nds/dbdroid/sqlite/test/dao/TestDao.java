@@ -4,7 +4,7 @@ import org.nds.dbdroid.DataBaseManager;
 import org.nds.dbdroid.dao.AndroidDAO;
 import org.nds.dbdroid.sqlite.test.entity.Test;
 
-public class TestDao extends AndroidDAO<Test> {
+public class TestDao extends AndroidDAO<Test, Integer> {
 
 	public TestDao(DataBaseManager dbManager) {
 		super(dbManager);
