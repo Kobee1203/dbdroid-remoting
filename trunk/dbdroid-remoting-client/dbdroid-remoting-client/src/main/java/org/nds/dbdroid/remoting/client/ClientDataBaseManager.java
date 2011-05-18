@@ -14,10 +14,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.ClassUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.CookieStore;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpOptions;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpTrace;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.entity.ContentProducer;
@@ -40,6 +48,7 @@ import org.nds.dbdroid.remoting.EntityAliases;
 import org.nds.dbdroid.remoting.RawQuery;
 import org.nds.dbdroid.remoting.XStreamHelper;
 import org.nds.dbdroid.service.EndPoint;
+import org.nds.dbdroid.service.HttpMethod;
 import org.nds.dbdroid.service.IAndroidService;
 import org.nds.dbdroid.type.DataType;
 import org.nds.dbdroid.type.DbDroidType;
@@ -237,8 +246,10 @@ class ClientDataBaseManager extends DataBaseManager {
             // Bind custom cookie store to the local context
             localContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
 
-            String uri = getUri(clazz, method);
-            HttpUriRequest httpUriRequest = getHttpUriRequest(serverUrl + uri, clazz, method, args, entityAliases);
+            EndPoint endPointClazz = AnnotationUtils.getAnnotation(clazz, EndPoint.class);
+            EndPoint endPointMethod = AnnotationUtils.getAnnotation(method, EndPoint.class);
+            String uri = getUri(clazz.getName(), method.getName(), endPointClazz, endPointMethod);
+            HttpUriRequest httpUriRequest = getHttpUriRequest(serverUrl + uri, endPointClazz, endPointMethod, args, entityAliases);
             try {
                 HttpResponse response = httpClient.execute(httpUriRequest, localContext);
                 // String xml = HttpHelper.getStringResponse(response);
@@ -264,12 +275,71 @@ class ClientDataBaseManager extends DataBaseManager {
         return result;
     }
 
-    private HttpUriRequest getHttpUriRequest(String url, Class<?> clazz, Method method, final Object[] args, final EntityAliases entityAliases) {
+    private HttpUriRequest getHttpUriRequest(String url, EndPoint endPointClazz, EndPoint endPointMethod, Object[] args, EntityAliases entityAliases) {
 
         HttpUriRequest httpUriRequest;
 
-        HttpPost httppost = new HttpPost(url);
+        HttpMethod httpMethod;
+        if (endPointMethod != null && endPointMethod.httpMethod().length > 0) {
+            httpMethod = endPointMethod.httpMethod()[0];
+        } else if (endPointClazz != null && endPointClazz.httpMethod().length > 0) {
+            httpMethod = endPointClazz.httpMethod()[0];
+        } else {
+            httpMethod = HttpMethod.GET;
+        }
 
+        try {
+            switch (httpMethod) {
+                case DELETE:
+                    httpUriRequest = new HttpDelete(url + getUrlParams(args));
+                    break;
+                case GET:
+                    httpUriRequest = new HttpGet(url + getUrlParams(args));
+                    break;
+                case HEAD:
+                    httpUriRequest = new HttpHead(url + getUrlParams(args));
+                    break;
+                case OPTIONS:
+                    httpUriRequest = new HttpOptions(url + getUrlParams(args));
+                    break;
+                case POST:
+                    httpUriRequest = new HttpPost(url);
+                    ((HttpEntityEnclosingRequestBase) httpUriRequest).setEntity(getHttpEntity(args, entityAliases));
+                    break;
+                case PUT:
+                    httpUriRequest = new HttpPut(url);
+                    ((HttpEntityEnclosingRequestBase) httpUriRequest).setEntity(getHttpEntity(args, entityAliases));
+                    break;
+                case TRACE:
+                    httpUriRequest = new HttpTrace(url + getUrlParams(args));
+                    break;
+                default:
+                    httpUriRequest = new HttpGet(url + getUrlParams(args));
+                    break;
+            }
+        } catch (NonPrimitiveException e) {
+            httpUriRequest = new HttpPost(url);
+            ((HttpEntityEnclosingRequestBase) httpUriRequest).setEntity(getHttpEntity(args, entityAliases));
+        }
+
+        return httpUriRequest;
+    }
+
+    private String getUrlParams(Object[] args) throws NonPrimitiveException {
+        String urlParams = "";
+        if (args != null) {
+            for (Object arg : args) {
+                if (!arg.getClass().isPrimitive() && ClassUtils.wrapperToPrimitive(arg.getClass()) == null) {
+                    throw new NonPrimitiveException();
+                }
+                urlParams += "/" + arg;
+            }
+        }
+
+        return urlParams;
+    }
+
+    private HttpEntity getHttpEntity(final Object[] args, final EntityAliases entityAliases) {
         ContentProducer cp = new ContentProducer() {
             public void writeTo(OutputStream outstream) throws IOException {
                 if (args != null) {
@@ -281,30 +351,22 @@ class ClientDataBaseManager extends DataBaseManager {
             }
         };
         HttpEntity httpEntity = new EntityTemplate(cp);
-
-        httppost.setEntity(httpEntity);
-
+        return httpEntity;
     }
 
-    private String getUri(Class<?> clazz, Method method) {
-        String endPointClazz = "";
-        String endPointMethod = "";
+    private String getUri(String clazzName, String methodName, EndPoint endPointClazz, EndPoint endPointMethod) {
+        String endPointClazz_ = clazzName;
+        String endPointMethod_ = methodName;
 
-        EndPoint endPoint = AnnotationUtils.getAnnotation(clazz, EndPoint.class);
-        if (endPoint != null) {
-            if (endPoint.value() != null && endPoint.value().length() > 0) {
-                endPointClazz = endPoint.value();
-            }
+        if (endPointClazz != null && endPointClazz.value() != null && endPointClazz.value().length() > 0) {
+            endPointClazz_ = endPointClazz.value();
         }
 
-        endPoint = AnnotationUtils.getAnnotation(method, EndPoint.class);
-        if (endPoint != null) {
-            if (endPoint.value() != null && endPoint.value().length() > 0) {
-                endPointMethod = endPoint.value();
-            }
+        if (endPointMethod != null && endPointMethod.value() != null && endPointMethod.value().length() > 0) {
+            endPointMethod_ = endPointMethod.value();
         }
 
-        return "/" + endPointClazz + "/" + endPointMethod;
+        return "/" + endPointClazz_ + "/" + endPointMethod_;
     }
 
     private Class<?>[] getParameterTypes(Object[] args) {
