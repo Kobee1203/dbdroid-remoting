@@ -131,12 +131,30 @@ public class DBDroidRemotingTest {
         }
 
         // Delete
-        log.debug("** DELETE CONTACT **");
+        log.debug("** DELETE CONTACT BY OBJECT **");
         contactService.delete(contact);
         // Find By Id
         Contact contact2 = contactService.findById(contact.getId());
         if (contact2 == null) {
             log.debug("Contact with ID " + contact.getId() + " is deleted.");
+        }
+
+        // Delete 
+        log.debug("** DELETE CONTACT BY ID **");
+        contactService.delete(1);
+        // Find By Id
+        Contact contact3 = contactService.findById(1);
+        if (contact3 == null) {
+            log.debug("Contact with ID " + 1 + " is deleted.");
+        }
+
+        // Find All
+        log.debug("** FIND ALL CONTACTS **");
+        contacts = contactService.listContact();
+        if (contacts != null) {
+            for (Contact c : contacts) {
+                log.debug(c.toString());
+            }
         }
 
         // Raw Query

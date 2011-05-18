@@ -24,7 +24,9 @@ public class ServiceEndPoint {
 
     private String serviceName;
 
-    private final Map<String, List<HttpMethod>> methodMap = new HashMap<String, List<HttpMethod>>();
+    private final Map<String, List<HttpMethod>> httpMethodsByMethod = new HashMap<String, List<HttpMethod>>();
+
+    private final Map<String, String> methodByEndPoint = new HashMap<String, String>();
 
     public ServiceEndPoint(Object serviceBean) {
         this.serviceBean = serviceBean;
@@ -61,7 +63,8 @@ public class ServiceEndPoint {
                 }
             }
 
-            methodMap.put(methodName, httpMethodList);
+            httpMethodsByMethod.put(methodName, httpMethodList);
+            methodByEndPoint.put(methodName, method.getName());
         }
     }
 
@@ -73,16 +76,24 @@ public class ServiceEndPoint {
         return serviceBean;
     }
 
-    public boolean acceptHttpMethod(String method, HttpMethod httpMethod) {
-        if (!methodMap.containsKey(method)) {
-            logger.error("Method '" + method + "' not found for the Service '" + serviceName + "' (" + serviceBean + ")");
+    public boolean acceptHttpMethod(String endPoint, HttpMethod httpMethod) {
+        if (endPoint == null || !httpMethodsByMethod.containsKey(endPoint)) {
+            logger.error("EndPoint '" + endPoint + "' not found for the Service '" + serviceName + "' (" + serviceBean + ")");
             return false;
         }
-        List<HttpMethod> httpMethodList = methodMap.get(method);
+        List<HttpMethod> httpMethodList = httpMethodsByMethod.get(endPoint);
         return httpMethodList.isEmpty() || httpMethodList.contains(httpMethod);
     }
 
+    private String getRealMethod(String method) {
+        return methodByEndPoint.get(method);
+    }
+
     public Object invokeMethod(String method, Object[] arguments) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        return MethodUtils.invokeMethod(serviceBean, method, arguments);
+        String m = getRealMethod(method);
+        if (m == null) {
+            throw new NoSuchMethodException("Cannot found method: " + method + "() on object: " + serviceBean.getClass().getName());
+        }
+        return MethodUtils.invokeMethod(serviceBean, m, arguments);
     }
 }
