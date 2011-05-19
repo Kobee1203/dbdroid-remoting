@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -98,62 +100,71 @@ public class DBDroidRemotingTest {
         // Find All
         log.debug("** FIND ALL CONTACTS **");
         List<Contact> contacts = contactService.listContact();
-        if (contacts != null) {
-            for (Contact c : contacts) {
+        Assert.assertNotNull(contacts);
+        Assert.assertEquals(2, contacts.size());
+        Assert.assertEquals("[1] Nicolas Dos Santos (nicolas.dossantos@gmail.com, 06-XX-XX-XX-XX)", contacts.get(0).toString());
+        Assert.assertEquals("[2] John Doe (john@doe.com, 01-XX-XX-XX-XX)", contacts.get(1).toString());
+        /*for (Contact c : contacts) {
                 log.debug(c.toString());
-            }
-        }
+        }*/
 
         // Find By Id
         log.debug("** FIND CONTACT BY ID **");
         contact = contactService.findById(1);
-        if (contact != null) {
-            log.debug(contact.toString());
-        }
+        Assert.assertNotNull(contact);
+        Assert.assertEquals("[1] Nicolas Dos Santos (nicolas.dossantos@gmail.com, 06-XX-XX-XX-XX)", contact.toString());
+        // log.debug(contact.toString());
 
         // Save
         log.debug("** SAVE CONTACT **");
         contact = new Contact("firstname", "lastname", "email", "telephone");
         contact = contactService.save(contact);
-        if (contact != null) {
-            log.debug(contact.toString());
-        }
+        Assert.assertNotNull(contact);
+        Assert.assertEquals("[3] firstname lastname (email, telephone)", contact.toString());
+        // log.debug(contact.toString());
 
         // Update
         log.debug("** UPDATE CONTACT **");
         contact.setFirstname("new firstname");
         contact.setTelephone("new telephone");
         contact = contactService.update(contact);
-        if (contact != null) {
-            log.debug(contact.toString());
-        }
-
-        // Delete
+        Assert.assertNotNull(contact);
+        Assert.assertEquals("[3] new firstname lastname (email, new telephone)", contact.toString());
+        // log.debug(contact.toString());
+        
+        // Delete by object
         log.debug("** DELETE CONTACT BY OBJECT **");
+        contact = contactService.findById(contact.getId());
+        Assert.assertNotNull(contact);
+        Assert.assertEquals("[3] new firstname lastname (email, new telephone)", contact.toString());
+     
         contactService.delete(contact);
-        // Find By Id
-        Contact contact2 = contactService.findById(contact.getId());
-        if (contact2 == null) {
-            log.debug("Contact with ID " + contact.getId() + " is deleted.");
-        }
 
-        // Delete 
+        contact = contactService.findById(contact.getId());
+        Assert.assertNull(contact);
+        // log.debug("Contact with ID " + contact.getId() + " is deleted.");
+
+        // Delete by id
         log.debug("** DELETE CONTACT BY ID **");
+        contact = contactService.findById(1);
+        Assert.assertNotNull(contact);
+        Assert.assertEquals("[1] Nicolas Dos Santos (nicolas.dossantos@gmail.com, 06-XX-XX-XX-XX)", contact.toString());
+        
         contactService.delete(1);
         // Find By Id
-        Contact contact3 = contactService.findById(1);
-        if (contact3 == null) {
-            log.debug("Contact with ID " + 1 + " is deleted.");
-        }
+        contact = contactService.findById(1);
+        Assert.assertNull(contact);
+        // log.debug("Contact with ID " + 1 + " is deleted.");
 
         // Find All
         log.debug("** FIND ALL CONTACTS **");
         contacts = contactService.listContact();
-        if (contacts != null) {
-            for (Contact c : contacts) {
+        Assert.assertNotNull(contacts);
+        Assert.assertEquals(1, contacts.size());
+        Assert.assertEquals("[2] John Doe (john@doe.com, 01-XX-XX-XX-XX)", contacts.get(0).toString());
+        /*for (Contact c : contacts) {
                 log.debug(c.toString());
-            }
-        }
+        }*/
 
         // Raw Query
 
