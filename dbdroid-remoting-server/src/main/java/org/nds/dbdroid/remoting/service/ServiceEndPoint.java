@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
+import org.alfresco.service.cmr.repository.datatype.TypeConversionException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.nds.dbdroid.reflect.utils.AnnotationUtils;
@@ -88,14 +90,30 @@ public class ServiceEndPoint {
         return methodByEndPoint.get(method);
     }
 
-    public Object invokeMethod(String method, Object[] arguments) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        Method m = getRealMethod(method);
+    public Object invokeMethod(String endPoint, Object[] arguments) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        Method m = getRealMethod(endPoint);
         if (m == null) {
-            throw new NoSuchMethodException("Cannot found method: " + method + "() on object: " + serviceBean.getClass().getName());
+            throw new NoSuchMethodException("Cannot found endpoint method: " + endPoint + "() on object: " + serviceBean.getClass().getName());
         }
+        Class<?>[] paramsType = m.getParameterTypes();
+        if (paramsType != null && arguments != null && paramsType.length > arguments.length) {
+            throw new IllegalArgumentException("Number of Arguments in the Request (" + arguments.length + ") is not greater or equal to the number of arguments expected (" + paramsType.length + ") for endpoint method: " + endPoint + "() on object: " + serviceBean.getClass().getName());
+        }
+
         List<Object> args = new ArrayList<Object>();
-        for (Object arg : arguments) {
-            convert to the good primitive
+        for (int i = 0; i < arguments.length; i++) {
+            Class<?> paramType;
+            if (i < paramsType.length) {
+                paramType = paramsType[i];
+            } else { // Ellipse
+                paramType = paramsType[paramsType.length - 1];
+            }
+            Object arg;
+            try {
+                arg = DefaultTypeConverter.INSTANCE.convert(paramType, arguments[i]);
+            } catch (TypeConversionException e) {
+                arg = arguments[i];
+            }
             args.add(arg);
         }
         return m.invoke(serviceBean, args.toArray());

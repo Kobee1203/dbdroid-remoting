@@ -14,7 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.ClassUtils;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
+import org.alfresco.service.cmr.repository.datatype.TypeConversionException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.CookieStore;
@@ -317,7 +318,7 @@ class ClientDataBaseManager extends DataBaseManager {
                     httpUriRequest = new HttpGet(url + getUrlParams(args));
                     break;
             }
-        } catch (NonPrimitiveException e) {
+        } catch (TypeConversionException e) {
             httpUriRequest = new HttpPost(url);
             ((HttpEntityEnclosingRequestBase) httpUriRequest).setEntity(getHttpEntity(args, entityAliases));
         }
@@ -325,14 +326,16 @@ class ClientDataBaseManager extends DataBaseManager {
         return httpUriRequest;
     }
 
-    private String getUrlParams(Object[] args) throws NonPrimitiveException {
+    private String getUrlParams(Object[] args) throws TypeConversionException {
         String urlParams = "";
         if (args != null) {
             for (Object arg : args) {
-                if (!arg.getClass().isPrimitive() && ClassUtils.wrapperToPrimitive(arg.getClass()) == null) {
-                    throw new NonPrimitiveException();
+                try {
+                    String s = DefaultTypeConverter.INSTANCE.convert(String.class, arg);
+                    urlParams += "/" + s;
+                } catch (TypeConversionException e) {
+                    throw e;
                 }
-                urlParams += "/" + arg;
             }
         }
 

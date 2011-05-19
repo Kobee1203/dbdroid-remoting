@@ -49,8 +49,8 @@ public class ServiceDispatcherHandler implements HttpRequestHandler {
             List<Object> arguments = new ArrayList<Object>();
 
             String pathInfo = request.getRequestLine().getUri();
-            log.debug("pathInfo: " + pathInfo);
             pathInfo = pathInfo.replace(uri, "");
+            log.debug("pathInfo: " + pathInfo);
             if (pathInfo.startsWith("/")) {
                 pathInfo = pathInfo.substring(1);
             }
