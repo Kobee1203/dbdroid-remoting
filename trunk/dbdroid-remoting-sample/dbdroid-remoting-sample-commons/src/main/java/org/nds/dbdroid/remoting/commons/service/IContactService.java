@@ -15,7 +15,7 @@ public interface IContactService extends IAndroidService {
     Contact findById(Integer id);
 
     @EndPoint(httpMethod = { HttpMethod.POST, HttpMethod.PUT })
-    Contact save(Contact c);
+    Contact save(Contact contact);
 
     @EndPoint(httpMethod = HttpMethod.POST)
     Contact update(Contact contact);
