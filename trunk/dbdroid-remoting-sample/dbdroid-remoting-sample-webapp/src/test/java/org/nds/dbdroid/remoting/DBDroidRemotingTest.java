@@ -112,17 +112,15 @@ public class DBDroidRemotingTest {
         }
 
         // Save
-        /*log.debug("** SAVE CONTACT **");
-        Contact c = new Contact("firstname", "lastname", "email", "telephone");
-        contact = contactService.save(c);
+        log.debug("** SAVE CONTACT **");
+        contact = new Contact("firstname", "lastname", "email", "telephone");
+        contact = contactService.save(contact);
         if (contact != null) {
             log.debug(contact.toString());
-        }*/
+        }
 
         // Update
         log.debug("** UPDATE CONTACT **");
-        contact = new Contact("firstname", "lastname", "email", "telephone");
-        contact.setId(2);
         contact.setFirstname("new firstname");
         contact.setTelephone("new telephone");
         contact = contactService.update(contact);

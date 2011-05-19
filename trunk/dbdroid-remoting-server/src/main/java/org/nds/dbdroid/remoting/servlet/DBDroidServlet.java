@@ -100,6 +100,7 @@ public class DBDroidServlet extends HttpServlet {
             List<Object> arguments = new ArrayList<Object>();
 
             String pathInfo = request.getPathInfo();
+            log.debug("pathInfo: " + pathInfo);
             if (pathInfo.startsWith("/")) {
                 pathInfo = pathInfo.substring(1);
             }
@@ -140,14 +141,18 @@ public class DBDroidServlet extends HttpServlet {
                     log.debug(entry.getKey() + ": " + entry.getValue());
                 }
 
-                String s1 = toString(request.getInputStream());
-                log.debug("INPUSTREAM: " + s1);
-                //String s2 = toString(request.getReader());
-                //log.debug("READER: " + s2);
-                Object stringArgs = XStreamHelper.fromXML(s1, null);
-                Object[] args = stringArgs instanceof Object[] ? (Object[]) stringArgs : new Object[] { stringArgs };
-                for (Object arg : args) {
-                    arguments.add(arg);
+                if (request.getInputStream() != null) {
+                    String s1 = toString(request.getInputStream());
+                    log.debug("INPUSTREAM: " + s1);
+                    //String s2 = toString(request.getReader());
+                    //log.debug("READER: " + s2);
+                    Object stringArgs = XStreamHelper.fromXML(s1, null);
+                    if (stringArgs != null) {
+                        Object[] args = stringArgs instanceof Object[] ? (Object[]) stringArgs : new Object[] { stringArgs };
+                        for (Object arg : args) {
+                            arguments.add(arg);
+                        }
+                    }
                 }
 
                 log.debug("SERVICE NAME: " + service);

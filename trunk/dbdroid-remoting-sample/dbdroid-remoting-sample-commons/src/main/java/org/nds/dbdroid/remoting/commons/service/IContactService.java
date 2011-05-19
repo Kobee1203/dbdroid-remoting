@@ -20,7 +20,7 @@ public interface IContactService extends IAndroidService {
     @EndPoint(httpMethod = HttpMethod.POST)
     Contact update(Contact contact);
 
-    @EndPoint(value = "deleteContact", httpMethod = HttpMethod.POST)
+    @EndPoint(value = "deleteContact")
     void delete(Contact contact);
 
     @EndPoint(httpMethod = HttpMethod.DELETE)
