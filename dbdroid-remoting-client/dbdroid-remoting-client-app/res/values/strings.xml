@@ -4,4 +4,8 @@
     <string name="app_name">dbdroid-sqlite</string>
     <color name="white">#FFFFFF</color>
     <color name="title">#777777</color>
+    <color name="odd_row">#777777</color>
+    <color name="even_row">#777777</color>
+    <color name="odd_row_cell">#888888</color>
+    <color name="even_row_cell">#EEEEEE</color>
 </resources>
