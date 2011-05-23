@@ -2,4 +2,6 @@
 <resources>
     <string name="hello">Hello World, DbDroidSQLite!</string>
     <string name="app_name">dbdroid-sqlite</string>
+    <color name="white">#FFFFFF</color>
+    <color name="title">#777777</color>
 </resources>

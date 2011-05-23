@@ -33,8 +33,10 @@
     </properties>
 	
 	<modules>
+        <module>dbdroid-remoting-sample/dbdroid-remoting-sample-commons</module>
         <module>dbdroid-remoting-client</module>
         <module>dbdroid-remoting-server</module>
+        <module>dbdroid-remoting-sample/dbdroid-remoting-sample-webapp</module>
     </modules>
 	
 	<dependencyManagement>

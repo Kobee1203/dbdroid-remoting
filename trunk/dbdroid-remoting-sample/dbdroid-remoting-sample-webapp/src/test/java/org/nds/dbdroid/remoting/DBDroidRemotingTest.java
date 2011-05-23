@@ -14,6 +14,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nds.dbdroid.exception.DBDroidException;
@@ -68,7 +69,7 @@ public class DBDroidRemotingTest {
         runtTest(serverUrl);
     }
 
-    @Test
+    @Ignore
     public void testRemoteServer() throws DBDroidException {
         String serverUrl = "http://localhost:8080/dbdroid-remoting-sample-webapp/dbdroid-remoting";
         runtTest(serverUrl);

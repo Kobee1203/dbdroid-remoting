@@ -41,6 +41,38 @@
                     <target>1.5</target>
                 </configuration>
             </plugin>
+            <plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.6</version>
+				<executions>
+					<execution>
+						<phase>install</phase>
+						<configuration>
+							<tasks>
+								<property name="maven.repo" value="${settings.localRepository}" />
+								<echo message="Maven repo: ${maven.repo}" />
+								<echo message="filename: ${project.artifactId}-${project.parent.version}.${project.packaging}" />
+								
+								<taskdef classname="net.bluecow.googlecode.ant.GoogleCodeUploadTask" classpath="${maven.repo}/net/bluecow/googlecode/ant/ant-googlecode-0.0.2.jar" name="gcupload" />
+								
+								<property file="build.credentials.properties" />
+	    						<fail unless="gc.username" message="Missing property 'gc.username' from file 'build.credentials.properties'." />
+	    						<fail unless="gc.password" message="Missing property 'gc.password' from file 'build.credentials.properties'." />
+								
+								<gcupload username="${gc.username}" password="${gc.password}" 
+								          projectname="dbdroid-remoting" 
+								          filename="dbdroid-remoting-server/target/${project.artifactId}-${project.parent.version}.${project.packaging}" 
+								          targetfilename="${project.artifactId}-${project.parent.version}.${project.packaging}" 
+								          summary="Version ${project.parent.version} of ${project.artifactId}" 
+								          labels="${project.parent.version}, ${project.artifactId}, Database, Entity, DAO, Android, SQL, Remoting, XML, Serialiaze, DatabaseManager, Query, Developer" />
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
         </plugins>
     </build>
     
