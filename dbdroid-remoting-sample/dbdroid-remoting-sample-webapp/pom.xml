@@ -5,6 +5,7 @@
     <artifactId>dbdroid-remoting-sample-webapp</artifactId>
     <packaging>war</packaging>
     <version>0.0.1-SNAPSHOT</version>
+    <name>dbdroid-remoting-sample-webapp</name>
     <description></description>
     
     <properties>

@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="@string/hello"
-    />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/linearLayout1" 
+	android:layout_width="fill_parent" 
+	android:layout_height="fill_parent" android:background="@color/white">
+	<TableLayout android:id="@+id/tableLayout1" 
+	 	android:background="@drawable/table_shape" android:layout_height="fill_parent" android:layout_width="fill_parent">
+	    <TableRow android:id="@+id/tableRowTitle" android:layout_height="wrap_content" android:layout_width="fill_parent" android:gravity="center_horizontal">
+	        <TextView android:text="Contacts List" android:id="@+id/textViewTitle" android:layout_height="wrap_content" android:layout_width="wrap_content" android:textSize="18px" android:textStyle="bold" android:textColor="@color/title"></TextView>
+	    </TableRow>
+	    <TableRow android:background="#00ff00" android:layout_margin="2dip">
+	        <TextView android:text="TextView" android:background="#0000ff" android:layout_margin="2dip"/>
+	        <TextView android:id="@+id/amount" android:background="#0000ff" android:layout_margin="2dip"/>
+	        <Button android:id="@+id/button" android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="+" android:background="#0099ff" android:layout_margin="2dip"></Button>
+	    </TableRow>
+	</TableLayout>
 </LinearLayout>
