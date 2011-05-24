@@ -18,26 +18,5 @@
 	            <Button android:background="@drawable/edit" android:layout_gravity="right" android:layout_height="wrap_content" android:layout_width="wrap_content"></Button>
 	        </LinearLayout>
 	    </TableRow>
-        <TableRow android:background="@color/even_row" android:layout_width="fill_parent">
-            <TextView android:text="Nicolas" android:layout_height="wrap_content" android:layout_width="wrap_content" android:background="@color/even_row_cell" android:layout_margin="1dp" android:textColor="@color/odd_row_cell"></TextView>
-            <TextView android:text="Nicolas" android:layout_height="wrap_content" android:layout_width="wrap_content" android:background="@color/even_row_cell" android:layout_margin="1dp" android:textColor="@color/odd_row_cell"></TextView>
-            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="1dp" android:background="@color/even_row_cell">
-                <Button android:background="@drawable/edit" android:layout_gravity="right" android:layout_height="wrap_content" android:layout_width="wrap_content"></Button>
-            </LinearLayout>
-        </TableRow>
-        <TableRow android:background="@color/even_row" android:layout_width="fill_parent">
-            <TextView android:text="Nicolas" android:layout_height="wrap_content" android:layout_width="wrap_content" android:background="@color/even_row_cell" android:layout_margin="1dp" android:textColor="@color/odd_row_cell"></TextView>
-            <TextView android:text="Nicolas" android:layout_height="wrap_content" android:layout_width="wrap_content" android:background="@color/even_row_cell" android:layout_margin="1dp" android:textColor="@color/odd_row_cell"></TextView>
-            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="1dp" android:background="@color/even_row_cell">
-                <Button android:background="@drawable/edit" android:layout_gravity="right" android:layout_height="wrap_content" android:layout_width="wrap_content"></Button>
-            </LinearLayout>
-        </TableRow>
-        <TableRow android:background="@color/even_row" android:layout_width="fill_parent">
-            <TextView android:text="Nicolas" android:layout_height="wrap_content" android:layout_width="wrap_content" android:background="@color/even_row_cell" android:layout_margin="1dp" android:textColor="@color/odd_row_cell"></TextView>
-            <TextView android:text="Nicolas" android:layout_height="wrap_content" android:layout_width="wrap_content" android:background="@color/even_row_cell" android:layout_margin="1dp" android:textColor="@color/odd_row_cell"></TextView>
-            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="1dp" android:background="@color/even_row_cell">
-                <Button android:background="@drawable/edit" android:layout_gravity="right" android:layout_height="wrap_content" android:layout_width="wrap_content"></Button>
-            </LinearLayout>
-        </TableRow>
 	</TableLayout>
 </LinearLayout>

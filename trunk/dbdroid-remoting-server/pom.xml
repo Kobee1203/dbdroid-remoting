@@ -46,7 +46,7 @@
 				<version>1.6</version>
 				<executions>
 					<execution>
-						<phase>install</phase>
+						<phase>deploy</phase>
 						<configuration>
 							<tasks>
 								<property name="maven.repo" value="${settings.localRepository}" />
