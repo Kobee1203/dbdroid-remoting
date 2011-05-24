@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, DbDroidSQLite!</string>
-    <string name="app_name">dbdroid-sqlite</string>
+    <string name="hello">Hello World, DbDroidRemoting!</string>
+    <string name="app_name">dbdroid-remoting-app</string>
     <color name="white">#FFFFFF</color>
     <color name="title">#777777</color>
     <color name="odd_row">#777777</color>

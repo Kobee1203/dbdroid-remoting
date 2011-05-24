@@ -48,6 +48,12 @@
 	    	<artifactId>dbdroid-remoting-client</artifactId>
 	    	<version>${project.version}</version>
         </dependency>
+        
+        <dependency>
+            <groupId>org.nds.dbdroid.remoting</groupId>
+            <artifactId>dbdroid-remoting-sample-commons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
     
     <build>
