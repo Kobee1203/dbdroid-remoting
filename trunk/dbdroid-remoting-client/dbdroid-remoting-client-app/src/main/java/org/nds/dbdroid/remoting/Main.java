@@ -1,10 +1,14 @@
 package org.nds.dbdroid.remoting;
 
 import org.nds.dbdroid.remoting.commons.entity.Contact;
+import org.nds.logging.Logger;
+import org.nds.logging.LoggerFactory;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -14,57 +18,43 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 public class Main extends Activity {
-    /** Called when the activity is first created. */
+	
+	Logger logger = LoggerFactory.getLogger(Main.class);
+	
+	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        /*TableLayout tl = (TableLayout) findViewById(R.id.tableLayout1);
-        
+        TableLayout tl = (TableLayout) findViewById(R.id.tableLayout1);
+        logger.info("Retrieve TableLayout: " + tl.getId());
+
         Contact contact = new Contact("Nicolas", "Dos Santos", "nicolas.dossantos@gmail.com", "+33123465789");
         for(int i = 0; i< 15; i++) {
-        	TableRow tr = createRow(i%1==1, contact);
+        	logger.info("Create Row ("+i+")...");
+        	TableRow tr = createRow(i%2==0, contact);
         	tl.addView(tr);
-        }*/
+        	logger.info("Row created");
+        }
     }
 
 	private TableRow createRow(boolean oddRow, Contact contact) {
-        TableRow tr = new TableRow(this);
-        tr.setBackgroundColor(oddRow ? R.color.odd_row : R.color.even_row);
-        tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+		logger.info("Row is odd: " + oddRow);
         
-        View cell = createCell(oddRow, contact.getFirstname());
-        tr.addView(cell);
-        cell = createCell(oddRow, contact.getLastname());
-        tr.addView(cell);
-        cell = createCellButton(oddRow, R.drawable.edit);
-        tr.addView(cell);
-        
+        LayoutInflater inflater = (LayoutInflater)getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        TableRow tr;
+        if(oddRow) {
+        	tr = (TableRow) inflater.inflate(R.layout.odd_row, null, true);
+        } else {
+        	tr = (TableRow) inflater.inflate(R.layout.even_row, null, true);
+        }
+		TextView firstname = (TextView) tr.getChildAt(0);
+		firstname.setText(contact.getFirstname());
+		TextView lastname = (TextView) tr.getChildAt(1);
+		lastname.setText(contact.getLastname());
+
         return tr;
 	}
 
-	private View createCell(boolean oddRow, String text) {
-        TextView cell = new TextView(this);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.setMargins(1, 1, 1, 1); // left,top,right, bottom
-        cell.setLayoutParams(params);
-        cell.setBackgroundColor(oddRow ? R.color.odd_row_cell : R.color.even_row_cell);
-        cell.setText(text);
-        return cell;
-	}
-	
-	private View createCellButton(boolean oddRow, int edit) {
-		LinearLayout cell = new LinearLayout(this);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.setMargins(1, 1, 1, 1); // left,top,right, bottom
-        cell.setLayoutParams(params);
-        cell.setBackgroundColor(oddRow ? R.color.odd_row_cell : R.color.even_row_cell);
-        Button button = new Button(this);
-        button.setBackgroundResource(edit);
-        button.setGravity(Gravity.RIGHT);
-        button.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        cell.addView(button);
-		return cell;
-	}
 }
