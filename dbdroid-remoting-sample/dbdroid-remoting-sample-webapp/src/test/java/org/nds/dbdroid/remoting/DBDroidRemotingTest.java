@@ -132,13 +132,13 @@ public class DBDroidRemotingTest {
         Assert.assertNotNull(contact);
         Assert.assertEquals("[3] new firstname lastname (email, new telephone)", contact.toString());
         // log.debug(contact.toString());
-        
+
         // Delete by object
         log.debug("** DELETE CONTACT BY OBJECT **");
         contact = contactService.findById(contact.getId());
         Assert.assertNotNull(contact);
         Assert.assertEquals("[3] new firstname lastname (email, new telephone)", contact.toString());
-     
+
         contactService.delete(contact);
 
         contact = contactService.findById(contact.getId());
@@ -150,7 +150,7 @@ public class DBDroidRemotingTest {
         contact = contactService.findById(1);
         Assert.assertNotNull(contact);
         Assert.assertEquals("[1] Nicolas Dos Santos (nicolas.dossantos@gmail.com, 06-XX-XX-XX-XX)", contact.toString());
-        
+
         contactService.delete(1);
         // Find By Id
         contact = contactService.findById(1);
