@@ -12,6 +12,7 @@ import org.nds.logging.LoggerFactory;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -102,6 +103,11 @@ public class Main extends Activity {
 
         public void onClick(View view) {
             Toast.makeText(getApplicationContext(), "Edit " + contact, Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(getApplicationContext(), ContactActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("contact", new ContactParcelable(contact));
+            intent.putExtras(bundle);
+            startActivity(intent);
         }
     }
 
