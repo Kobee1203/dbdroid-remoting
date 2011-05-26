@@ -54,7 +54,11 @@ public class Main extends Activity {
     private void setUpTableLayout() {
         List<Contact> contacts = contactService.listContact();
         logger.debug("contacts: %s", contacts);
-
+		if(contacts == null) {
+			Toast t = Toast.makeText(this, "Cannot connect to remote server -> cannot retrieve contacts", Toast.LENGTH_LONG);
+            t.show();
+            return;
+		}
         TableLayout tl = (TableLayout) findViewById(R.id.tableLayout1);
         logger.info("Retrieve TableLayout: %s", tl.getId());
         tl.removeAllViews();
