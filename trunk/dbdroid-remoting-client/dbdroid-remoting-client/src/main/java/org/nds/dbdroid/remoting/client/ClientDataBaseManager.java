@@ -19,6 +19,7 @@ import org.alfresco.service.cmr.repository.datatype.TypeConversionException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.CookieStore;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
@@ -237,7 +238,7 @@ class ClientDataBaseManager extends DataBaseManager {
     private Object send(Class<?> clazz, Method method, Object[] args, EntityAliases entityAliases) {
         Object result = null;
 
-        DefaultHttpClient httpClient = new DefaultHttpClient();
+        HttpClient httpClient = new DefaultHttpClient();
         try {
             // Create a local instance of cookie store
             CookieStore cookieStore = new BasicCookieStore();

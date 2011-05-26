@@ -18,12 +18,14 @@ public class ServerRunner {
             IContactService contactService = applicationContext.getBean(IContactService.class);
 
             ServerFactoryBean sfb = new ServerFactoryBean();
+            sfb.setServerPort(12345);
+            //sfb.setKeyStore(ServerRunner.class.getResource("dossantos.jks"), "DosSantos", "DosSantos");
             sfb.setUrlPattern("/dbdroid-remoting/*");
             sfb.registerService(contactService);
             Server server = sfb.create();
             server.start();
 
-            String serverUrl = "http://" + server.getServerHostName() + ":" + server.getServerPort();
+            String serverUrl = server.getServerURL(); // "http://" + server.getServerHostName() + ":" + server.getServerPort();
             System.out.println("Server available at " + serverUrl);
 
             String message = null;
@@ -35,7 +37,6 @@ public class ServerRunner {
                 System.out.flush(); // empties buffer, before you input text
                 message = stdin.readLine();
             }
-            Thread.sleep(3000);
 
             server.stop();
         } catch (Exception e) {
