@@ -55,11 +55,11 @@ public class Main extends Activity {
     private void setUpTableLayout() {
         List<Contact> contacts = contactService.listContact();
         logger.debug("contacts: %s", contacts);
-		if(contacts == null) {
-			Toast t = Toast.makeText(this, "Cannot connect to remote server -> cannot retrieve contacts", Toast.LENGTH_LONG);
+        if (contacts == null) {
+            Toast t = Toast.makeText(this, "Cannot connect to remote server -> cannot retrieve contacts", Toast.LENGTH_LONG);
             t.show();
             return;
-		}
+        }
         TableLayout tl = (TableLayout) findViewById(R.id.tableLayout1);
         logger.info("Retrieve TableLayout: %s", tl.getId());
         tl.removeAllViews();
@@ -105,7 +105,8 @@ public class Main extends Activity {
             Toast.makeText(getApplicationContext(), "Edit " + contact, Toast.LENGTH_LONG).show();
             Intent intent = new Intent(getApplicationContext(), ContactActivity.class);
             Bundle bundle = new Bundle();
-            bundle.putParcelable("contact", new ContactParcelable(contact));
+            //bundle.putParcelable("contact", new ContactParcelable(contact));
+            bundle.putSerializable("contact", contact);
             intent.putExtras(bundle);
             startActivity(intent);
         }

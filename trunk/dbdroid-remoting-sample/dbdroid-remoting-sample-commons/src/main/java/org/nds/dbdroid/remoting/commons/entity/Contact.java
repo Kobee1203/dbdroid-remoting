@@ -1,11 +1,15 @@
 package org.nds.dbdroid.remoting.commons.entity;
 
+import java.io.Serializable;
+
 import org.nds.dbdroid.annotation.Column;
 import org.nds.dbdroid.annotation.Entity;
 import org.nds.dbdroid.annotation.Id;
 
 @Entity(name = "CONTACTS")
-public class Contact {
+public class Contact implements Serializable {
+
+    private static final long serialVersionUID = -3247556077199553090L;
 
     @Id
     @Column(name = "ID")
