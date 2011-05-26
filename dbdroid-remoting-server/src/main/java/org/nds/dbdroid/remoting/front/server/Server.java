@@ -6,6 +6,9 @@ import org.apache.http.protocol.HttpRequestHandler;
 
 public interface Server {
 
+    String DEFAULT_HOSTNAME = "127.0.0.1";
+    int DEFAULT_PORT = 0;
+	
     void start() throws Exception;
 
     void stop() throws Exception;
@@ -19,4 +22,6 @@ public interface Server {
     String getServerHostName();
 
     SocketAddress getServerAddress();
+
+	String getServerURL();
 }

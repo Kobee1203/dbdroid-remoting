@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 
 import org.apache.http.ConnectionReuseStrategy;
@@ -40,11 +41,11 @@ public class ServerImpl implements Server {
 
     /**
      * The local address to bind to.
-     * The host is an IP number rather than "localhost" to avoid surprises
+     * The default host is an IP number rather than "localhost" to avoid surprises
      * on hosts that map "localhost" to an IPv6 address or something else.
-     * The port is 0 to let the system pick one.
+     * The default port is 0 to let the system pick one.
      */
-    public final static InetSocketAddress TEST_SERVER_ADDR = new InetSocketAddress("127.0.0.1", 0);
+    public final InetSocketAddress TEST_SERVER_ADDR;
 
     /** The request handler registry. */
     private final HttpRequestHandlerRegistry handlerRegistry;
@@ -75,49 +76,84 @@ public class ServerImpl implements Server {
     private final AtomicInteger acceptedConnections = new AtomicInteger(0);
 
     /**
-     * Creates a new test server.
+     * Creates a new server.
      *
      * @param proc      the HTTP processors to be used by the server, or
-     *                  <code>null to use a
+     *                  <code>null</code> to use a
      *                  {@link #newProcessor default} processor
      * @param reuseStrat the connection reuse strategy to be used by the 
-     *                  server, or <code>null to use
+     *                  server, or <code>null</code> to use
      *                  {@link #newConnectionReuseStrategy() default}
      *                  strategy.                 
      * @param params    the parameters to be used by the server, or
-     *                  <code>null to use
+     *                  <code>null</code> to use
      *                  {@link #newDefaultParams default} parameters
      * @param sslcontext optional SSL context if the server is to leverage
      *                   SSL/TLS transport security
+     * @param hostname  the host name to be used by the server, or 
+     *                  <code>null</code> to use {@link #DEFAULT_HOSTNAME}.
+     * @param port      the port number. A valid port value is between 0 and 65535, or 
+     *                  <code>null</code> to use {@link #DEFAULT_PORT}.
+     *                  A port number of zero will let the system pick up an ephemeral port in a bind operation. 
      */
-    public ServerImpl(BasicHttpProcessor proc, ConnectionReuseStrategy reuseStrat, HttpParams params, SSLContext sslcontext) {
+    public ServerImpl(BasicHttpProcessor proc, ConnectionReuseStrategy reuseStrat, HttpParams params, SSLContext sslcontext, String hostname, int port) {
         super();
         this.handlerRegistry = new HttpRequestHandlerRegistry();
         this.reuseStrategy = (reuseStrat != null) ? reuseStrat : newConnectionReuseStrategy();
         this.httpProcessor = (proc != null) ? proc : newProcessor();
         this.serverParams = (params != null) ? params : newDefaultParams();
         this.sslcontext = sslcontext;
+        
+        TEST_SERVER_ADDR = new InetSocketAddress(hostname, port);
     }
 
     /**
-     * Creates a new test server.
-     *
+     * Creates a new server.
      * @param proc      the HTTP processors to be used by the server, or
-     *                  <code>null to use a
+     *                  <code>null</code> to use a
      *                  {@link #newProcessor default} processor
      * @param params    the parameters to be used by the server, or
-     *                  <code>null to use
+     *                  <code>null</code> to use
+     *                  {@link #newDefaultParams default} parameters
+     * @param hostName  the host name to be used by the server, or 
+     *                  <code>null</code> to use {@link #DEFAULT_HOSTNAME}.
+     * @param port      the port number. A valid port value is between 0 and 65535, or 
+     *                  <code>null</code> to use {@link #DEFAULT_PORT}.
+     *                  A port number of zero will let the system pick up an ephemeral port in a bind operation. 
+     */
+    public ServerImpl(BasicHttpProcessor proc, HttpParams params, String hostName, int port) {
+    	this(proc, null, params, null, hostName == null ? DEFAULT_HOSTNAME : hostName, port < 0 || port > 0xFFFF ? DEFAULT_PORT : port);
+	}
+    
+    /**
+     * <p>Creates a new server.</p>
+     * <p>Host name = {@link #DEFAULT_HOSTNAME}, port number = {@link #DEFAULT_PORT}</p>
+     *
+     * @param proc      the HTTP processors to be used by the server, or
+     *                  <code>null</code> to use a
+     *                  {@link #newProcessor default} processor
+     * @param params    the parameters to be used by the server, or
+     *                  <code>null</code> to use
      *                  {@link #newDefaultParams default} parameters
      */
     public ServerImpl(BasicHttpProcessor proc, HttpParams params) {
-        this(proc, null, params, null);
+        this(proc, params, DEFAULT_HOSTNAME, DEFAULT_PORT);
     }
-
-    public ServerImpl() {
-        this(null, null);
-    }
-
+    
     /**
+     * <p>Creates a new server.</p>
+     * <p>Host name = {@link #DEFAULT_HOSTNAME}, port number = {@link #DEFAULT_PORT}</p>
+     * <ul>
+     * <li>use {@link #newProcessor default} processor,</li> 
+     * <li>use {@link #newConnectionReuseStrategy() default} strategy,</li> 
+     * <li>use {@link #newDefaultParams default} parameters</li>
+     * </ul>
+     */
+    public ServerImpl() {
+        this(null, null, DEFAULT_HOSTNAME, DEFAULT_PORT);
+    }
+
+	/**
      * Obtains an HTTP protocol processor with default interceptors.
      *
      * @return  a protocol processor for server-side use
@@ -245,8 +281,8 @@ public class ServerImpl implements Server {
     @Override
     public String toString() {
         ServerSocket ssock = servicedSocket; // avoid synchronization
-        StringBuffer sb = new StringBuffer(80);
-        sb.append("LocalTestServer/");
+        StringBuffer sb = new StringBuffer();
+        sb.append("Server/");
         if (ssock == null) {
             sb.append("stopped");
         } else {
@@ -297,6 +333,21 @@ public class ServerImpl implements Server {
         return ssock.getLocalSocketAddress();
     }
 
+    public String getServerURL() {
+    	ServerSocket ssock = servicedSocket; // avoid synchronization
+    	if (ssock == null) {
+            throw new IllegalStateException("not running");
+        }
+    	StringBuilder sb = new StringBuilder();
+    	sb.append("http");
+    	if(ssock instanceof SSLServerSocket) {
+    		sb.append("s");
+    	}
+    	sb.append("://");
+    	sb.append(this.getServerHostName()).append(":").append(this.getServerPort());
+    	return sb.toString();
+    }
+    
     /**
      * The request listener.
      * Accepts incoming connections and launches a service thread.
