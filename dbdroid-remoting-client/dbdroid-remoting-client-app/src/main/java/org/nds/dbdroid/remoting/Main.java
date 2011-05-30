@@ -13,6 +13,7 @@ import org.nds.logging.LoggerFactory;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,6 +52,11 @@ public class Main extends Activity {
 
         setUpTableLayout();
     }
+    
+    @Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+	}
 
     private void setUpTableLayout() {
         List<Contact> contacts = contactService.listContact();
@@ -108,7 +114,7 @@ public class Main extends Activity {
             //bundle.putParcelable("contact", new ContactParcelable(contact));
             bundle.putSerializable("contact", contact);
             intent.putExtras(bundle);
-            startActivity(intent);
+            getApplicationContext().startActivity(intent);
         }
     }
 
