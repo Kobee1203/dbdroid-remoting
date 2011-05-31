@@ -1,10 +1,7 @@
 package org.nds.dbdroid.remoting;
 
-import java.io.InputStream;
 import java.util.List;
 
-import org.nds.dbdroid.exception.DBDroidException;
-import org.nds.dbdroid.remoting.client.ClientManager;
 import org.nds.dbdroid.remoting.commons.entity.Contact;
 import org.nds.dbdroid.remoting.commons.service.IContactService;
 import org.nds.logging.Logger;
@@ -27,28 +24,11 @@ public class Main extends Activity {
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
-    private static final String serverUrl = "http://10.0.2.2:12345/dbdroid-remoting";
-
-    private IContactService contactService;
-
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-
-        try {
-            InputStream in = getClass().getResourceAsStream("/dbdroid.xml");
-            ClientManager clientManager = new ClientManager(in, serverUrl);
-            clientManager.loadConfig();
-
-            contactService = clientManager.getService(IContactService.class);
-            logger.debug("contactService: %s", contactService);
-        } catch (DBDroidException e) {
-            Toast t = Toast.makeText(this, "Cannot initialize the client manager for Web Services: " + e.getMessage(), Toast.LENGTH_LONG);
-            t.show();
-            e.printStackTrace();
-        }
 
         setUpTableLayout();
     }
@@ -57,8 +37,13 @@ public class Main extends Activity {
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 	}
+    
+    private ApplicationState getApplicationState() {
+    	return (ApplicationState) getApplication();
+    }
 
     private void setUpTableLayout() {
+    	IContactService contactService = getApplicationState().getService(IContactService.class);
         List<Contact> contacts = contactService.listContact();
         logger.debug("contacts: %s", contacts);
         if (contacts == null) {
@@ -127,6 +112,7 @@ public class Main extends Activity {
         }
 
         public void onClick(View view) {
+        	IContactService contactService = getApplicationState().getService(IContactService.class);
             Toast.makeText(getApplicationContext(), "Delete " + contact, Toast.LENGTH_LONG).show();
             contactService.delete(contact.getId());
             setUpTableLayout();
