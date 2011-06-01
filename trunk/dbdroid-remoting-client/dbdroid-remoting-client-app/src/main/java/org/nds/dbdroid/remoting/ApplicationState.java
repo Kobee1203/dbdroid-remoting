@@ -4,7 +4,6 @@ import java.io.InputStream;
 
 import org.nds.dbdroid.exception.DBDroidException;
 import org.nds.dbdroid.remoting.client.ClientManager;
-import org.nds.dbdroid.remoting.commons.service.IContactService;
 import org.nds.dbdroid.service.IAndroidService;
 import org.nds.logging.Logger;
 import org.nds.logging.LoggerFactory;
