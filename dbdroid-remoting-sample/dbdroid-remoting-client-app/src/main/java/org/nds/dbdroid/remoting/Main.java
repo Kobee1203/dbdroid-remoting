@@ -42,6 +42,11 @@ public class Main extends Activity {
     	return (ApplicationState) getApplication();
     }
 
+    @Override
+    public Context getApplicationContext() {
+        return getApplicationState().getApplicationContext();
+    }
+    
     private void setUpTableLayout() {
     	IContactService contactService = getApplicationState().getService(IContactService.class);
         List<Contact> contacts = contactService.listContact();
@@ -93,13 +98,13 @@ public class Main extends Activity {
         }
 
         public void onClick(View view) {
-            Toast.makeText(getApplicationContext(), "Edit " + contact, Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(getApplicationContext(), ContactActivity.class);
+            Toast.makeText(Main.this, "Edit " + contact, Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(Main.this, ContactActivity.class);
             Bundle bundle = new Bundle();
             //bundle.putParcelable("contact", new ContactParcelable(contact));
             bundle.putSerializable("contact", contact);
             intent.putExtras(bundle);
-            getApplicationContext().startActivity(intent);
+            Main.this.startActivity(intent);
         }
     }
 
@@ -113,7 +118,7 @@ public class Main extends Activity {
 
         public void onClick(View view) {
         	IContactService contactService = getApplicationState().getService(IContactService.class);
-            Toast.makeText(getApplicationContext(), "Delete " + contact, Toast.LENGTH_LONG).show();
+            Toast.makeText(Main.this, "Delete " + contact, Toast.LENGTH_LONG).show();
             contactService.delete(contact.getId());
             setUpTableLayout();
         }
