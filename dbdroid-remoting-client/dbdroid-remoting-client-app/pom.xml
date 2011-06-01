@@ -57,10 +57,22 @@
     </dependencies>
     
     <build>
+    	<!--<finalName>${project.artifactId}</finalName>-->
         <plugins>
             <plugin>
                 <groupId>com.jayway.maven.plugins.android.generation2</groupId>
                 <artifactId>maven-android-plugin</artifactId>
+                <configuration>
+                    <sdk>
+                        <platform>3</platform>
+                    </sdk>
+                    <emulator>
+                        <avd>16</avd>
+                    </emulator>
+                    <deleteConflictingFiles>true</deleteConflictingFiles>
+                    <undeployBeforeDeploy>true</undeployBeforeDeploy>
+                </configuration>
+                <extensions>true</extensions>
                 <!--executions>
                     <execution>
                         <id>startemulator</id>
