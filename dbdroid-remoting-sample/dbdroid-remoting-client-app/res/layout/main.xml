@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="fill_parent" android:layout_height="fill_parent" android:background="@color/white" android:orientation="vertical">
+    <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:background="@color/white" android:gravity="center_horizontal">
+        <TextView android:id="@+id/textViewTitle" android:layout_height="wrap_content" android:layout_width="wrap_content" android:textSize="18px" android:textStyle="bold" android:textColor="@color/title" android:text="@string/contacts_list"></TextView>
+    </LinearLayout>
+    <LinearLayout android:layout_width="fill_parent" android:layout_height="fill_parent" android:background="@color/white">
+        <TableLayout android:id="@+id/tableLayout1" android:background="@drawable/table_shape" android:layout_height="fill_parent" android:layout_width="fill_parent" android:stretchColumns="1" android:paddingTop="20dp">   
+    	    <!--include layout="@layout/odd_row" /-->
+    	    <!--include layout="@layout/even_row" /-->
+    	</TableLayout>
+    </LinearLayout>
+</LinearLayout>
