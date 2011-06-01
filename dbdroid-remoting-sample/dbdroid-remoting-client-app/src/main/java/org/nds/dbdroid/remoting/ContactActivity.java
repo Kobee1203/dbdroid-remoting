@@ -6,7 +6,6 @@ import org.nds.logging.Logger;
 import org.nds.logging.LoggerFactory;
 
 import android.app.Activity;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -38,13 +37,9 @@ public class ContactActivity extends Activity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 save();
+                finish();
             }
         });
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
     }
 
     private ApplicationState getApplicationState() {

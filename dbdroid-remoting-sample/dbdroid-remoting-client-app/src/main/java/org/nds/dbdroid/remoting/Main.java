@@ -10,7 +10,6 @@ import org.nds.logging.LoggerFactory;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,23 +31,24 @@ public class Main extends Activity {
 
         setUpTableLayout();
     }
-    
+
     @Override
-	public void onConfigurationChanged(Configuration newConfig) {
-		super.onConfigurationChanged(newConfig);
-	}
-    
+    protected void onResume() {
+        super.onResume();
+        setUpTableLayout();
+    }
+
     private ApplicationState getApplicationState() {
-    	return (ApplicationState) getApplication();
+        return (ApplicationState) getApplication();
     }
 
     @Override
     public Context getApplicationContext() {
         return getApplicationState().getApplicationContext();
     }
-    
+
     private void setUpTableLayout() {
-    	IContactService contactService = getApplicationState().getService(IContactService.class);
+        IContactService contactService = getApplicationState().getService(IContactService.class);
         List<Contact> contacts = contactService.listContact();
         logger.debug("contacts: %s", contacts);
         if (contacts == null) {
@@ -117,7 +117,7 @@ public class Main extends Activity {
         }
 
         public void onClick(View view) {
-        	IContactService contactService = getApplicationState().getService(IContactService.class);
+            IContactService contactService = getApplicationState().getService(IContactService.class);
             Toast.makeText(Main.this, "Delete " + contact, Toast.LENGTH_LONG).show();
             contactService.delete(contact.getId());
             setUpTableLayout();
