@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>org.nds.dbdroid.remoting</groupId>
+        <artifactId>dbdroid-remoting-parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+    
+    <groupId>org.nds.dbdroid.remoting</groupId>
+    <artifactId>dbdroid-remoting-sample-parent</artifactId>
+    <packaging>pom</packaging>
+    <name>dbdroid-remoting-sample</name>
+
+	<description></description>
+
+	<developers>
+		<developer>
+			<id>nicolas.dossantos</id>
+			<name>Nicolas Dos Santos</name>
+			<email>nicolas.dossantos@gmail.com</email>
+		</developer>
+	</developers>
+	
+	<url>http://code.google.com/p/dbdroid-remoting/</url>
+	
+	<licenses>
+		<license>
+			<name>GNU Lesser General Public License</name>
+			<url>http://www.gnu.org/licenses/lgpl.html</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	
+	<modules>
+        <module>dbdroid-remoting-sample-commons</module>
+        <module>dbdroid-remoting-client-app</module>
+        <module>dbdroid-remoting-sample-webapp</module>
+    </modules>
+</project>

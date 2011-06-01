@@ -4,7 +4,7 @@
 	
     <parent>
         <groupId>org.nds.dbdroid.remoting</groupId>
-        <artifactId>dbdroid-remoting-client-parent</artifactId>
+        <artifactId>dbdroid-remoting-sample-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     
@@ -64,7 +64,7 @@
                 <artifactId>maven-android-plugin</artifactId>
                 <configuration>
                     <sdk>
-                        <platform>3</platform>
+                        <platform>4</platform>
                     </sdk>
                     <emulator>
                         <avd>16</avd>
