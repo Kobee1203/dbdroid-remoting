@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>org.nds.dbdroid.remoting</groupId>
+        <artifactId>dbdroid-remoting-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+    
+    <groupId>org.nds.dbdroid.remoting</groupId>
+    <artifactId>dbdroid-remoting-server</artifactId>
+    <packaging>jar</packaging>
+    <name>dbdrdoid-remoting-server : Exposing Web Services</name>
+
+	<description></description>
+
+	<developers>
+		<developer>
+			<id>nicolas.dossantos</id>
+			<name>Nicolas Dos Santos</name>
+			<email>nicolas.dossantos@gmail.com</email>
+		</developer>
+	</developers>
+	
+	<url>http://code.google.com/p/dbdroid-remoting/</url>
+	
+    <properties>
+        <org.springframework.version>3.0.2.RELEASE</org.springframework.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+            <plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.6</version>
+				<executions>
+					<execution>
+						<phase>deploy</phase>
+						<configuration>
+							<tasks>
+								<property name="maven.repo" value="${settings.localRepository}" />
+								<echo message="Maven repo: ${maven.repo}" />
+								<echo message="filename: ${project.artifactId}-${project.parent.version}.${project.packaging}" />
+								
+								<taskdef classname="net.bluecow.googlecode.ant.GoogleCodeUploadTask" classpath="${maven.repo}/net/bluecow/googlecode/ant/ant-googlecode-0.0.2.jar" name="gcupload" />
+								
+								<property name="gc.username" value="${gc.username}" />
+                                <property name="gc.password" value="${gc.password}" />
+	    						<fail unless="gc.username" message="Missing property 'gc.username' from file 'settings.xml'. Define a profile with the propety and active it." />
+	    						<fail unless="gc.password" message="Missing property 'gc.password' from file 'settings.xml'. Define a profile with the propety and active it." />
+								
+								<gcupload username="${gc.username}" password="${gc.password}" 
+								          projectname="dbdroid-remoting" 
+								          filename="dbdroid-remoting-server/target/${project.artifactId}-${project.parent.version}.${project.packaging}" 
+								          targetfilename="${project.artifactId}-${project.parent.version}.${project.packaging}" 
+								          summary="Version ${project.parent.version} of ${project.artifactId}" 
+								          labels="${project.parent.version}, ${project.artifactId}, Database, Entity, DAO, Android, SQL, Remoting, XML, Serialize, DatabaseManager, Query, Developer" />
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+        </plugins>
+    </build>
+    
+    <dependencies>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+        <!--  DOZER  DTO Data Transfert Object -->
+        <dependency>
+                <groupId>net.sf.dozer</groupId>
+                <artifactId>dozer</artifactId>
+                <version>4.0</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-collections</groupId>
+                        <artifactId>commons-collections</artifactId>
+                    </exclusion>
+                </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.4.2</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+        <dependency>
+            <!-- JDK 1.6 -->
+            <!--groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-util</artifactId>
+            <version>RELEASE691</version-->
+            <!-- JDK 1.5 -->
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-util</artifactId>
+            <version>RELEASE67</version>            
+        </dependency>
+        <dependency>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpclient</artifactId>
+		    <version>4.0.1</version>
+		</dependency>
+        <dependency>
+            <groupId>org.nds.dbdroid</groupId>
+            <artifactId>dbdroid-core</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nds.dbdroid.remoting</groupId>
+            <artifactId>dbdroid-remoting-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+    
+    <repositories>
+        <repository>
+            <id>maven2-repository.bits.netbeans.org</id>
+            <name>NetBeans Repository for Maven</name>
+            <url>http://bits.netbeans.org/maven2/</url>
+        </repository>
+    </repositories>
+</project>
