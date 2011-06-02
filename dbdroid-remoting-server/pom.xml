@@ -11,7 +11,7 @@
     <groupId>org.nds.dbdroid.remoting</groupId>
     <artifactId>dbdroid-remoting-server</artifactId>
     <packaging>jar</packaging>
-    <name>dbdrdoid-remoting-server : communicate a database with a remote an Android app</name>
+    <name>dbdrdoid-remoting-server : Exposing Web Services</name>
 
 	<description></description>
 

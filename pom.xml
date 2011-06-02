@@ -6,7 +6,7 @@
     <artifactId>dbdroid-remoting-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>dbdrdoid-remoting : communicate an Android app to a remote database - pom parent</name>
+    <name>dbdrdoid-remoting : communicate an Android app to a remote server via Web Services - pom parent</name>
 
 	<description></description>
 
