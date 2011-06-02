@@ -73,7 +73,7 @@
         <dependency>
             <groupId>org.nds.dbdroid.remoting</groupId>
             <artifactId>dbdroid-remoting-sample-commons</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
