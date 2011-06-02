@@ -23,8 +23,10 @@ public class ContactActivity extends Activity {
         setContentView(R.layout.contact);
 
         Bundle bundle = getIntent().getExtras();
-        contact = (Contact) bundle.getSerializable("contact");
-        initForm(contact);
+        if (bundle != null) {
+            contact = (Contact) bundle.getSerializable("contact");
+            initForm(contact);
+        }
 
         Button cancelButton = (Button) findViewById(R.id.cancelButton);
         cancelButton.setOnClickListener(new View.OnClickListener() {
@@ -53,14 +55,28 @@ public class ContactActivity extends Activity {
             newContact = true;
         }
 
+        boolean error = false;
+
         EditText firstNameEditText = (EditText) findViewById(R.id.contact_firstname);
         contact.setFirstname(firstNameEditText.getText().toString());
+        if (contact.getFirstname() == null || contact.getFirstname().trim().length() == 0) {
+            firstNameEditText.setHighlightColor(R.color.red);
+            error = true;
+        }
         EditText lastNameEditText = (EditText) findViewById(R.id.contact_lastname);
         contact.setLastname(lastNameEditText.getText().toString());
+        if (contact.getLastname() == null || contact.getLastname().trim().length() == 0) {
+            firstNameEditText.setHighlightColor(R.color.red);
+            error = true;
+        }
         EditText phoneEditText = (EditText) findViewById(R.id.contact_phone);
         contact.setTelephone(phoneEditText.getText().toString());
         EditText emailEditText = (EditText) findViewById(R.id.contact_email);
         contact.setEmail(emailEditText.getText().toString());
+
+        if (error) {
+            return;
+        }
 
         IContactService contactService = getApplicationState().getService(IContactService.class);
         contact = newContact ? contactService.save(contact) : contactService.update(contact);

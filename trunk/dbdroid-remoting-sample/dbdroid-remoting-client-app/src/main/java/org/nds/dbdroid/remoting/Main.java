@@ -12,6 +12,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TableLayout;
@@ -38,13 +41,40 @@ public class Main extends Activity {
         setUpTableLayout();
     }
 
-    private ApplicationState getApplicationState() {
-        return (ApplicationState) getApplication();
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_contact_list, menu);
+        logger.debug("Menu created.");
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        boolean success = false;
+        switch (item.getItemId()) {
+            case R.id.itemNewContact:
+                Toast.makeText(Main.this, "New Contact", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(Main.this, ContactActivity.class);
+                Main.this.startActivity(intent);
+                success = true;
+                break;
+            case R.id.itemExit:
+                Toast.makeText(Main.this, "Bye bye...", Toast.LENGTH_SHORT).show();
+                this.finish();
+                success = true;
+                break;
+        }
+        return success;
     }
 
     @Override
     public Context getApplicationContext() {
         return getApplicationState().getApplicationContext();
+    }
+
+    private ApplicationState getApplicationState() {
+        return (ApplicationState) getApplication();
     }
 
     private void setUpTableLayout() {
@@ -101,7 +131,6 @@ public class Main extends Activity {
             Toast.makeText(Main.this, "Edit " + contact, Toast.LENGTH_LONG).show();
             Intent intent = new Intent(Main.this, ContactActivity.class);
             Bundle bundle = new Bundle();
-            //bundle.putParcelable("contact", new ContactParcelable(contact));
             bundle.putSerializable("contact", contact);
             intent.putExtras(bundle);
             Main.this.startActivity(intent);

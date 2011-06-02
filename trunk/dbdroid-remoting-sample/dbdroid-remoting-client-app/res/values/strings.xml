@@ -5,6 +5,9 @@
 
 	<string name="contacts_list">Contacts List</string>
 
+    <string name="new_contact">New Contact</string>
+    <string name="exit">Exit</string>
+
 	<string name="contact">Contact</string>
 	<string name="firstname">Firstname</string>
 	<string name="lastname">Lastname</string>
@@ -14,6 +17,7 @@
     <string name="cancel">Cancel</string>
     
     <color name="white">#FFFFFF</color>
+    <color name="red">#FF0000</color>
     <color name="title">#777777</color>
     <color name="odd_row">#777777</color>
     <color name="even_row">#777777</color>
