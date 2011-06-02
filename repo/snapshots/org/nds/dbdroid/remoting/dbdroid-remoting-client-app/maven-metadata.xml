@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.nds.dbdroid.remoting</groupId>
+  <artifactId>dbdroid-remoting-client-app</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <versioning>
+    <versions>
+      <version>1.0.0-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20110602215908</lastUpdated>
+  </versioning>
+</metadata>
