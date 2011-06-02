@@ -11,7 +11,7 @@
     <groupId>org.nds.dbdroid.remoting</groupId>
     <artifactId>dbdroid-remoting-client</artifactId>
     <packaging>jar</packaging>
-    <name>dbdroid-remoting-client : communicate an Android app to a remote database</name>
+    <name>dbdroid-remoting-client : Accessing Web Services</name>
 
 	<description></description>
 
@@ -100,7 +100,7 @@
 								
 								<gcupload username="${gc.username}" password="${gc.password}" 
 								          projectname="dbdroid-remoting" 
-								          filename="dbdroid-remoting-client/dbdroid-remoting-client/target/${project.artifactId}-${project.parent.version}.${project.packaging}" 
+								          filename="dbdroid-remoting-client/target/${project.artifactId}-${project.parent.version}.${project.packaging}" 
 								          targetfilename="${project.artifactId}-${project.parent.version}.${project.packaging}" 
 								          summary="Version ${project.parent.version} of ${project.artifactId}" 
 								          labels="${project.parent.version}, ${project.artifactId}, Database, Entity, DAO, Android, SQL, Remoting, XML, Serialiaze, DatabaseManager, Query, Developer" />

@@ -11,7 +11,7 @@
     <groupId>org.nds.dbdroid.remoting</groupId>
     <artifactId>dbdroid-remoting-client-app</artifactId>
     <packaging>apk</packaging>
-    <name>dbdrdoid-remoting-client-app : Android app which communicate with a remote database</name>
+    <name>dbdrdoid-remoting-client-app : Android app which tests dbdroid-remoting</name>
 
 	<description></description>
 
